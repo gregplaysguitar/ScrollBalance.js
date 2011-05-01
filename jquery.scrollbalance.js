@@ -31,9 +31,12 @@ $('.scrollwrap').scrollbalance({
                 var col = $(this),
                     colHeight = col.outerHeight(true),
                     colWidth = col.width(),
-                    maxScroll = container.height() - colHeight,
-                    pinTop = colHeight < ($(window).height() - col.offset().top);
+                    maxScroll = container.height() - colHeight;
                 
+                function pinTop() {
+                    return (colHeight < $(window).height());
+                };
+
                 if (maxScroll > 100) {
                     var innerHeight = col.height(),
                         inner = $('<div>').append(col.children());
@@ -53,7 +56,7 @@ $('.scrollwrap').scrollbalance({
 
                     var fixTop, fixLeft;
                     function balance_init() {
-                        if (pinTop) {
+                        if (pinTop()) {
                             fixTop = 0;
                         }
                         else {
@@ -63,7 +66,7 @@ $('.scrollwrap').scrollbalance({
                     };
                     
                     function balance() {
-                        if (pinTop) {
+                        if (pinTop()) {
                             var raw_scroll = $(window).scrollTop() - top;
                         }
                         else {
