@@ -12,7 +12,8 @@ $('.scrollwrap').scrollbalance({
 
     $.fn.scrollbalance = (function(options){
         var settings = $.extend({
-            childSelector: '.scrollbox'
+            childSelector: '.scrollbox',
+            topBuffer: 0
         }, options);
 
         this.each(function() {
@@ -57,7 +58,7 @@ $('.scrollwrap').scrollbalance({
                     var fixTop, fixLeft;
                     function balance_init() {
                         if (pinTop()) {
-                            fixTop = 0;
+                            fixTop = settings.topBuffer;
                         }
                         else {
                             fixTop = $(window).height() - colHeight;
@@ -67,7 +68,7 @@ $('.scrollwrap').scrollbalance({
                     
                     function balance() {
                         if (pinTop()) {
-                            var raw_scroll = $(window).scrollTop() - top;
+                            var raw_scroll = $(window).scrollTop() - top + settings.topBuffer;
                         }
                         else {
                             var raw_scroll = ($(window).height() + $(window).scrollTop()) - (top + colHeight);
