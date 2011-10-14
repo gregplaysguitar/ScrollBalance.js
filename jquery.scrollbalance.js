@@ -51,9 +51,9 @@ $('.scrollwrap').scrollbalance({
                         width: colWidth + 'px',
                         position: 'absolute',
                         top: 0,
-                        left: 0
+                        left: 0,
+                        paddingLeft: col.css('paddingLeft')
                     });
-
 
                     var fixTop, fixLeft;
                     function balance_init() {
@@ -63,7 +63,7 @@ $('.scrollwrap').scrollbalance({
                         else {
                             fixTop = $(window).height() - colHeight;
                         }
-                        fixLeft = col.offset().left;
+                        fixLeft = col.offset().left + parseInt(col.css('borderLeftWidth'));
                     };
                     
                     function balance() {
