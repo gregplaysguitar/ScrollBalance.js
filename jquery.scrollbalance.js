@@ -6,14 +6,29 @@ $('.scrollwrap').scrollbalance({
     childSelector: '.mycolumn'
 });
 
+params
+
+childSelector: 
+ 
+topBuffer: the 
+
+threshold: the 
+
+
 
 */
 (function($) {
 
     $.fn.scrollbalance = (function(options){
         var settings = $.extend({
+            // selector to find the child elements of container which should be balanced.
             childSelector: '.scrollbox',
-            topBuffer: 0
+            
+            // distance to maintain between the top of the stationary element and the top of the container.
+            topBuffer: 0,
+            
+            // threshold for activating the plugin, eg the column heights must differ by at least this amount to be affected.
+            threshold: 100
         }, options);
 
         this.each(function() {
@@ -38,7 +53,8 @@ $('.scrollwrap').scrollbalance({
                     return (colHeight < $(window).height());
                 };
 
-                if (maxScroll > 100) {
+                // don't do anything if the columns are too close in height.
+                if (maxScroll > settings.threshold) {
                     var innerHeight = col.height(),
                         inner = $('<div>').append(col.children());
                     
