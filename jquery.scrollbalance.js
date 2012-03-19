@@ -32,9 +32,12 @@ threshold: the
         }, options);
 
         this.each(function() {
-            var container = $(this),
-                top = container.offset().top;
+            var container = $(this);
             
+            
+            function top() {
+                return container.offset().top;
+            };
             
             // make sure container has height
             container.find(settings.childSelector).each(function() {
@@ -84,10 +87,10 @@ threshold: the
                     
                     function balance() {
                         if (pinTop()) {
-                            var raw_scroll = $(window).scrollTop() - top + settings.topBuffer;
+                            var raw_scroll = $(window).scrollTop() - top() + settings.topBuffer;
                         }
                         else {
-                            var raw_scroll = ($(window).height() + $(window).scrollTop()) - (top + colHeight);
+                            var raw_scroll = ($(window).height() + $(window).scrollTop()) - (top() + colHeight);
                         }
                         var scroll = Math.max(
                             0,
