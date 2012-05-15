@@ -193,7 +193,6 @@ threshold: the
             container.data('scrollbalance-initialise', function() {
                 initialise();
                 balance();
-                console.log('test');
             });
             
         });
