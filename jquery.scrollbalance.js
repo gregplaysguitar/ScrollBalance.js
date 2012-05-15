@@ -32,109 +32,173 @@ threshold: the
         }, options);
 
         this.each(function() {
-            var container = $(this);
+            var container = $(this),
+                cols = container.find(settings.childSelector);
+            
+  
+            /*
+            
+            Setup:
+            - Add wrap div
+            - Calculate column width
+            
+            Initialisation:
+            - Calculate container height, reset if necessary
+            - Calculate column height
+            - Calculate window width & height
+            - Add/remove balance listener if appropriate
+            
+            On scroll:
+            - Balance listener fires
+            
+            */
             
             
-            function top() {
-                return container.offset().top;
-            };
+            // Setup
+            cols.each(function() {
+                var col = $(this),
+                    inner = $('<div>').append(col.children());
             
-            // make sure container has height
-            container.find(settings.childSelector).each(function() {
-                if (container.height() < $(this).outerHeight(true)) {
-                    container.css('height', $(this).outerHeight(true) + 'px');
-                }
+                col.html('').append(inner).css({
+                    position: 'relative'
+                });
+                
+                inner.css({
+                    position: 'absolute',
+                    top: 0,
+                    left: 0
+                });
+                
+                col.data('scrollbalance-data', {
+                    inner: inner
+                });
             });
             
-            container.find(settings.childSelector).each(function() {
-                var col = $(this),
-                    colHeight = col.outerHeight(true),
-                    colWidth = col.width(),
-                    maxScroll = container.height() - colHeight;
+            
+            // Initialisation
+            function initialise() {
+                var maxHeight = 0;
                 
-                function pinTop() {
-                    return (colHeight < $(window).height());
-                };
-
-                // don't do anything if the columns are too close in height.
-                if (maxScroll > settings.threshold) {
-                    var innerHeight = col.height(),
-                        inner = $('<div>').append(col.children());
+                cols.each(function() {
+                    var col = $(this),
+                        data = col.data('scrollbalance-data'),
+                        colWidth = col.width();
                     
-                    col.html('').append(inner).css({
-                        height: innerHeight + 'px',
-                        position: 'relative'
-                    });
-                    
-                    inner.css({
+                    data['inner'].css({
                         width: colWidth + 'px',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
                         paddingLeft: col.css('paddingLeft')
                     });
-
-                    var fixTop, fixLeft;
-                    function balance_init() {
-                        if (pinTop()) {
-                            fixTop = settings.topBuffer;
-                        }
-                        else {
-                            fixTop = $(window).height() - colHeight;
-                        }
-                        fixLeft = col.offset().left + parseInt(col.css('borderLeftWidth'));
-                    };
                     
-                    function balance() {
-                        if (pinTop()) {
-                            var raw_scroll = $(window).scrollTop() - top() + settings.topBuffer;
+                    col.css('height', data['inner'].outerHeight(true));
+
+                    data['colHeight'] = col.outerHeight() + parseInt(col.css('marginTop'));
+                    maxHeight = Math.max(data['colHeight'], maxHeight);
+
+                    data['pinTop'] = (data['colHeight'] < $(window).height());
+                    
+                    if (data['pinTop']) {
+                        data['fixTop'] = settings.topBuffer;
+                    }
+                    else {
+                        data['fixTop'] = $(window).height() - data['colHeight'];
+                    }
+                    data['fixLeft'] = col.offset().left + parseInt(col.css('borderLeftWidth'));
+                });
+                
+                // make sure container has height
+                if (container.height() < maxHeight) {
+                    container.height(maxHeight);
+                }
+                
+                cols.each(function() {
+                    var col = $(this),
+                        data = $(this).data('scrollbalance-data');
+
+                    data['maxScroll'] = container.height() - col.outerHeight(true);
+                });
+
+                
+            };
+            
+
+            // balance
+            function balance() {
+                var top = container.offset().top,
+                    scrollTop = $(window).scrollTop();
+                
+                cols.each(function() {
+                    var col = $(this),
+                        data = col.data('scrollbalance-data');
+
+                    
+                    if (data['maxScroll'] <= settings.threshold) {
+                        // don't do anything if the columns are too close in height.
+                        data['inner'].css({
+                            position: 'absolute',
+                            top: 0,
+                            left: 0
+                        }); 
+                    }
+                    else {
+                        if (data['pinTop']) {
+                            var raw_scroll = scrollTop - top + settings.topBuffer;
                         }
                         else {
-                            var raw_scroll = ($(window).height() + $(window).scrollTop()) - (top() + colHeight);
+                            var raw_scroll = ($(window).height() + scrollTop) - (top + data['colHeight']);
                         }
                         var scroll = Math.max(
                             0,
                             Math.min(
-                                maxScroll,
+                                data['maxScroll'],
                                 raw_scroll
                             )
                         );
-
-                        if (scroll && scroll < maxScroll) {
-                            inner.css({
+    
+                        if (scroll && scroll < data['maxScroll']) {
+                            // element is fixed when window is scrolling between 'up' and 'down' states below
+                            data['inner'].css({
                                 position: 'fixed',
-                                top: fixTop + 'px',
-                                left: fixLeft - $(window).scrollLeft() + 'px'
+                                top: data['fixTop'] + 'px',
+                                left: data['fixLeft'] - $(window).scrollLeft() + 'px'
                             });
                         }
                         else if (scroll) {
-                            inner.css({
+                            // element is at the bottom of the container when window is scrolled down
+                            data['inner'].css({
                                 position: 'absolute',
-                                top: maxScroll + 'px',
+                                top: data['maxScroll'] + 'px',
                                 left: 0
                             });
                         }
                         else {
-                            inner.css({
+                            // element is at the top of the container when window is scrolled up
+                            data['inner'].css({
                                 position: 'absolute',
                                 top: 0,
                                 left: 0
                             });
-
                         }
-                    };
-                    
-                    balance_init();
-                    balance();
-                    $(window).scroll(balance);
-                    $(window).resize(function() {
-                        balance_init();
-                        balance();
-                    });
-                }
+                    }
+                });
+            };
+            
+            initialise();
+            balance();
+            $(window).scroll(balance);
+            $(window).resize(function() {
+                initialise();
+                balance();
             });
-
+            
+            container.data('scrollbalance-initialise', function() {
+                initialise();
+                balance();
+                console.log('test');
+            });
+            
         });
+        
+        return this;
     });
         
 
