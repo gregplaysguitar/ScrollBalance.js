@@ -185,14 +185,21 @@ threshold: the
             initialise();
             balance();
             $(window).scroll(balance);
-            $(window).resize(function() {
+            
+            function resize() {
                 initialise();
                 balance();
-            });
+            };
+            $(window).on('resize', resize);
             
             container.data('scrollbalance-initialise', function() {
                 initialise();
                 balance();
+            });
+            
+            container.data('scrollbalance-teardown', function() {
+                $(window).off('scroll', balance);
+                $(window).off('resize', resize);
             });
             
         });
