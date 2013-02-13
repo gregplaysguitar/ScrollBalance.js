@@ -91,7 +91,7 @@ threshold: the
                     
                     col.css('height', data['inner'].outerHeight(true));
 
-                    data['colHeight'] = col.outerHeight() + parseInt(col.css('marginTop'));
+                    data['colHeight'] = col.outerHeight() + (parseInt(col.css('marginTop')) || 0);
                     maxHeight = Math.max(data['colHeight'], maxHeight);
 
                     data['pinTop'] = (data['colHeight'] < $(window).height());
@@ -102,7 +102,7 @@ threshold: the
                     else {
                         data['fixTop'] = $(window).height() - data['colHeight'];
                     }
-                    data['fixLeft'] = col.offset().left + parseInt(col.css('borderLeftWidth'));
+                    data['fixLeft'] = col.offset().left + (parseInt(col.css('borderLeftWidth')) || 0);
                 });
                 
                 // make sure container has height
