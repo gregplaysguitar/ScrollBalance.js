@@ -28,7 +28,11 @@ threshold: the
             topBuffer: 0,
             
             // threshold for activating the plugin, eg the column heights must differ by at least this amount to be affected.
-            threshold: 100
+            threshold: 100,
+            
+            // filter for columns which should be pinned to the top, even if they are 
+            // taller than the viewport
+            pinTopFilter: null
         }, options);
 
         this.each(function() {
@@ -53,7 +57,7 @@ threshold: the
                     maxScroll = container.height() - colHeight;
                 
                 function pinTop() {
-                    return (colHeight < $(window).height());
+                    return settings.pinTopFilter && col.is(settings.pinTopFilter) || (colHeight < $(window).height());
                 };
 
                 // don't do anything if the columns are too close in height.
