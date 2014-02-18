@@ -1,54 +1,67 @@
 <!doctype html>
 <html>
-	<head>
-		<title>Scroll Balance Demo</title>
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
-		<script type="text/javascript" src="jquery.scrollbalance.js"></script>
-		
-		<style>
-		    body {
-		        font-family: helvetica, sans-serif;
-		    }
-		    #container {
-		        width: 960px;
-			    margin: 0 auto;
-		    }
-			h1, .info {
-			    margin-left: 10px;
-			    margin-right: 10px;   
-			}
-			pre {
-			    border: 1px solid #ddd;
-			    background: #f5f5f5;
-			    padding: 9px;
-			}
-			.wrap .column {
-			    width: 300px;
-			    float: left;
-			    display: inline;
-			    margin: 0 10px;
-			    color: #aaa;
-			}
-			.wrap .column h3,
-			.wrap .column em {
-			    color: #222;
-			}
-			footer {
-			    margin: 0 10px 50px;
-			    color: #aaa;
-			}
-			
-		</style>
-		<script type="text/javascript">
-			$(function() {
-				$('.wrap').scrollbalance({
-				    childSelector: '.column'
-				});
-			});
-		</script>
-	</head>
-	<body>
-	    <div id="container">
+  <head>
+    <title>Scroll Balance Demo</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+    <script type="text/javascript" src="jquery.scrollbalance.js"></script>
+    
+    <style>
+        body {
+            font-family: helvetica, sans-serif;
+        }
+        #container {
+            width: 960px;
+          margin: 0 auto;
+        }
+        h1, .info {
+            margin-left: 10px;
+            margin-right: 10px;   
+        }
+        pre {
+            border: 1px solid #ddd;
+            background: #f5f5f5;
+            padding: 9px;
+        }
+        .wrap .column {
+            width: 300px;
+            float: left;
+            display: inline;
+            margin: 0 10px;
+            color: #aaa;
+        }
+        .wrap .column h3,
+        .wrap .column em {
+            color: #222;
+        }
+        .wrap .column a {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        footer {
+            margin: 0 10px 50px;
+            color: #aaa;
+        }
+      
+    </style>
+    <script type="text/javascript">
+        $(function() {
+            $('.wrap').scrollbalance({
+              childSelector: '.column'
+            });
+            
+            var reinitialise = $('.wrap').data('scrollbalance').reinitialise;
+            
+            $('<a>').text('Add content').click(function() {
+                var p = $(this).parent().find('p').eq(-1);
+                p.clone().insertAfter(p);
+                reinitialise();
+            }).insertAfter($('.wrap .column h3'));
+            reinitialise();
+        });
+    </script>
+  </head>
+  <body>
+      <div id="container">
             <h1 id="banner">Scroll Balance Demo</h1>
             <section class="info">
                 <h4>Usage:</h4>
@@ -80,9 +93,7 @@ $(function() {
                     <p> 
                         Aenean purus ipsum, blandit aliquam tincidunt et, condimentum sed magna. Donec eleifend tempor convallis. Suspendisse potenti. Mauris consectetur luctus risus id blandit. Maecenas sit amet mauris enim. Praesent nec leo orci, ut sagittis felis. Aliquam sed mauris nulla, at mattis enim. Cras ut est diam. Nulla suscipit, sem ac ultrices mattis, purus leo porttitor dui, tristique egestas ligula mauris ac tortor. Cras eu lacus dui. Sed id tortor faucibus tellus porta placerat. Mauris id nunc eu eros mattis dapibus sit amet ut nibh. Nulla luctus hendrerit vehicula. Pellentesque sagittis, lacus tempus feugiat lacinia, leo orci bibendum erat, non condimentum risus neque eu tortor. Aliquam erat volutpat. Aliquam ligula ligula, mollis id mattis in, convallis eget diam. Aliquam in mi turpis, ac porttitor enim. Cras magna urna, porta eget pulvinar sit amet, molestie quis dui.
                     </p> 
-                    <p> 
-                        Etiam interdum mollis ligula eget vulputate. Fusce ac tincidunt urna. Fusce lobortis tristique luctus. Nullam eleifend leo ut tellus volutpat consectetur. Sed sagittis interdum nisi, placerat elementum arcu sagittis et. Mauris accumsan scelerisque nisl ac auctor. Proin porttitor porta turpis, non hendrerit nisi blandit eget. Integer et nibh est, eu cursus est. Praesent massa erat, gravida at aliquam id, facilisis quis lectus. Sed convallis augue non ipsum ultrices laoreet. Donec aliquam blandit consequat. Integer non sapien massa, sed aliquam turpis. Etiam dolor felis, tristique id tincidunt vel, tristique a turpis. Etiam convallis diam vel neque pretium laoreet. Sed in enim sem. Proin sit amet felis mauris, id congue lacus. Sed ipsum nisi, sagittis vitae euismod eget, ornare in dolor. Morbi justo risus, consequat id blandit id, vehicula ac nisl. Morbi tempor molestie nunc, in vehicula mauris mollis id. Donec porttitor nibh vel lorem ultricies at imperdiet nibh placerat.
-                    </p> 
+                    
                     
                 </article>
                 <article class="column">
@@ -91,14 +102,8 @@ $(function() {
                         <em>This long column should scroll as normal.</em> 
                     </p>
                     <p> 
-                        Aenean purus ipsum, blandit aliquam tincidunt et, condimentum sed magna. Donec eleifend tempor convallis. Suspendisse potenti. Mauris consectetur luctus risus id blandit. Maecenas sit amet mauris enim. Praesent nec leo orci, ut sagittis felis. Aliquam sed mauris nulla, at mattis enim. Cras ut est diam. Nulla suscipit, sem ac ultrices mattis, purus leo porttitor dui, tristique egestas ligula mauris ac tortor. Cras eu lacus dui. Sed id tortor faucibus tellus porta placerat. Mauris id nunc eu eros mattis dapibus sit amet ut nibh. Nulla luctus hendrerit vehicula. Pellentesque sagittis, lacus tempus feugiat lacinia, leo orci bibendum erat, non condimentum risus neque eu tortor. Aliquam erat volutpat. Aliquam ligula ligula, mollis id mattis in, convallis eget diam. Aliquam in mi turpis, ac porttitor enim. Cras magna urna, porta eget pulvinar sit amet, molestie quis dui.
-                    </p> 
-                    <p> 
                         Etiam interdum mollis ligula eget vulputate. Fusce ac tincidunt urna. Fusce lobortis tristique luctus. Nullam eleifend leo ut tellus volutpat consectetur. Sed sagittis interdum nisi, placerat elementum arcu sagittis et. Mauris accumsan scelerisque nisl ac auctor. Proin porttitor porta turpis, non hendrerit nisi blandit eget. Integer et nibh est, eu cursus est. Praesent massa erat, gravida at aliquam id, facilisis quis lectus. Sed convallis augue non ipsum ultrices laoreet. Donec aliquam blandit consequat. Integer non sapien massa, sed aliquam turpis. Etiam dolor felis, tristique id tincidunt vel, tristique a turpis. Etiam convallis diam vel neque pretium laoreet. Sed in enim sem. Proin sit amet felis mauris, id congue lacus. Sed ipsum nisi, sagittis vitae euismod eget, ornare in dolor. Morbi justo risus, consequat id blandit id, vehicula ac nisl. Morbi tempor molestie nunc, in vehicula mauris mollis id. Donec porttitor nibh vel lorem ultricies at imperdiet nibh placerat.
                     </p> 
-                    <p> 
-                        Mauris eu dolor justo. Morbi vel accumsan leo. Morbi non lectus eu nunc interdum facilisis sed a neque. Nulla facilisi. Nulla mi urna, tempor et feugiat at, posuere sed urna. Nunc rutrum lorem ut libero porta sed accumsan diam fermentum. Sed condimentum, dolor et venenatis pretium, quam tellus viverra diam, sed faucibus quam nisi ut mauris. Integer quis urna quam, iaculis euismod est. Proin sem mi, viverra id tristique quis, elementum a quam. Aenean in lorem in nisi tincidunt posuere. Quisque justo purus, aliquam eget egestas vel, aliquet vel metus. Proin vitae odio est. Suspendisse congue dui ut mauris congue in sollicitudin urna ornare. Ut nec arcu ipsum, nec sollicitudin nibh.
-                    </p>
                     <p> 
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris venenatis augue ut lacus fermentum sit amet fermentum nibh viverra. Cras egestas porta ante in lacinia. Sed mattis cursus tortor, vitae eleifend nisi sagittis vitae. Maecenas faucibus ullamcorper tristique. Phasellus sit amet metus massa, id feugiat nulla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed adipiscing mattis dignissim. Vivamus id lacus nisl. Donec congue dui leo, imperdiet ultricies nunc. Sed eu malesuada risus. Nullam iaculis ultricies arcu ornare fringilla. Maecenas porttitor pulvinar mi non vehicula. Aenean sed nunc lacus, eu tempor leo. Nam feugiat augue eu neque convallis vehicula. Duis blandit tellus nec eros varius nec cursus augue auctor. Vivamus tellus ante, ultricies vel egestas sollicitudin, pretium eu lectus. Mauris at lobortis enim. Sed mi mauris, suscipit at gravida a, scelerisque quis ipsum. Vivamus luctus tincidunt rhoncus. Ut sit amet nulla eu ipsum varius vestibulum vitae eget dui.
                     </p> 
@@ -149,5 +154,5 @@ $(function() {
             </footer>
         </div>
 
-	</body>
+  </body>
 </html>
