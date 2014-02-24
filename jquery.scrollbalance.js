@@ -35,6 +35,7 @@ $('.scrollwrap').scrollbalance({
             // Initial setup
             container.find(settings.childSelector).each(function() {
                 var col = $(this),
+                    original_height = col.height(),
                     inner = $('<div>').addClass('scrollbalance-inner')
                                       .append(col.children());
             
@@ -42,6 +43,7 @@ $('.scrollwrap').scrollbalance({
                     //height: innerHeight + 'px',
                     position: 'relative'
                 });
+                inner.css('minHeight', original_height);
             });
             
             function balance_init() {
