@@ -4,7 +4,7 @@ A jQuery plugin that intelligently uses position: fixed to combat unsightly gaps
 in multi-column layouts, when columns are of different heights. See index.html 
 for a demo.
 
-Requires jquery version 1.2.6 or higher. 
+Requires jquery version 1.7 or higher.
 
 ## Usage
 
@@ -47,6 +47,32 @@ For example:
     ...
     
     api.reinitialise();
+
+
+### Temporarily disabling the plugin
+
+The plugin can be turned on and off with the `enable` and `disable` api methods.
+For example, for smaller screen sizes where the columns don't have room to float
+side-by-side:
+  
+    var api = $('.wrap').data('scrollbalance');
+    $(window).on('resize', function() {
+        if ($(window).width() > 900) {
+            api.enable();
+        }
+        else {
+            api.disable();                    
+        }
+    });
+
+
+### Removing the plugin from an element
+
+The `teardown` method removes all trace of jquery-scrollbalance from an element.
+For example:
+    
+    var api = $('.wrap').data('scrollbalance');
+    api.teardown();
 
 
 ### Demo

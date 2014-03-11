@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Scroll Balance Demo</title>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
     <script type="text/javascript" src="jquery.scrollbalance.js"></script>
     
     <style>
@@ -49,14 +49,14 @@
               childSelector: '.column'
             });
             
-            var reinitialise = $('.wrap').data('scrollbalance').reinitialise;
+            var api = $('.wrap').data('scrollbalance');
             
             $('<a>').text('Add content').click(function() {
                 var p = $(this).parent().find('p').eq(-1);
                 p.clone().insertAfter(p);
-                reinitialise();
+                api.reinitialise();
             }).insertAfter($('.wrap .column h3'));
-            reinitialise();
+            api.reinitialise();
         });
     </script>
   </head>
@@ -68,7 +68,7 @@
                 <pre>
 $(function() {
     $('.wrap').scrollbalance({
-        childSelector: '.column' //defaults to '.scrollbox'
+        childSelector: '.column'
     });
 });
                 </pre>
@@ -130,6 +130,8 @@ $(function() {
                     </p> 
                     
                 </article>
+                
+                <div style="clear: both"></div>
             </div>
             <footer>
                 <h3>Footer</h3>
