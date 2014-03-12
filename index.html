@@ -45,18 +45,16 @@
     </style>
     <script type="text/javascript">
         $(function() {
-            $('.wrap').scrollbalance({
-              childSelector: '.column'
-            });
+            $('.wrap .column').scrollbalance();
             
-            var api = $('.wrap').data('scrollbalance');
+            var api = $('.wrap .column').data('scrollbalance');
             
             $('<a>').text('Add content').click(function() {
                 var p = $(this).parent().find('p').eq(-1);
                 p.clone().insertAfter(p);
-                api.reinitialise();
+                api.initialise();
             }).insertAfter($('.wrap .column h3'));
-            api.reinitialise();
+            api.initialise();
         });
     </script>
   </head>
@@ -67,9 +65,7 @@
                 <h4>Usage:</h4>
                 <pre>
 $(function() {
-    $('.wrap').scrollbalance({
-        childSelector: '.column'
-    });
+    $('.wrap').scrollbalance();
 });
                 </pre>
                 
