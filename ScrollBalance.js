@@ -188,7 +188,7 @@ heights:
                 var fix_top = pin_top ? this.settings.topBuffer :
                                 $(window).height() - col_height,
                     fix_left = col.offset().left + 
-                               parseInt(col.css('borderLeftWidth'));
+                               (parseInt(col.css('borderLeftWidth')) || 0);
                 inner.css({
                     position: 'fixed',
                     top: fix_top + 'px',
