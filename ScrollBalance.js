@@ -48,9 +48,12 @@ heights:
                 left: 0,
                 paddingLeft: col.css('paddingLeft')
             });
-            col.css({
-                height: inner.outerHeight(true)
-            });
+            if (col.css('box-sizing') === 'border-box') {
+                col.height(inner.height());
+            }
+            else {
+                col.height(inner.outerHeight(true));
+            }
         });
         this.balance_all();
     };
