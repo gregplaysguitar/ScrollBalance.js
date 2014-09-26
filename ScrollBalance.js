@@ -122,8 +122,14 @@ heights:
     ScrollBalance.prototype.container_height = function() {
         /* Calculates the maximum column height, i.e. how high the 
            container should be. (Don't assume the user is using a
-           clearfix hack on their container). */
-
+           clearfix hack on their container). If there's only one
+           column, use the parent height, so that the column will
+           fix within its parent. */
+        
+        if (this.columns.length === 1) {
+            return this.columns.parent().height();
+        }
+        
         var height = 0;
         this.columns.each(function() {
             height = Math.max(height, $(this).outerHeight(true))
