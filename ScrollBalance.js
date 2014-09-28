@@ -113,9 +113,10 @@ heights:
                 inner = $('<div>').addClass(INNER_CLASSNAME)
                                   .append(col.children());
 
-            col.html('').append(inner).css({
-                position: 'relative'
-            });
+            col.html('').append(inner);
+            if (col.css('position') === 'static') {
+                col.css('position', 'relative');
+            }
             inner.css('minHeight', original_height);
         });
     };
@@ -123,8 +124,7 @@ heights:
         /* Calculates the maximum column height, i.e. how high the 
            container should be. (Don't assume the user is using a
            clearfix hack on their container). If there's only one
-           column, use the parent height, so that the column will
-           fix within its parent. */
+           column, use the parent height. */
         
         if (this.columns.length === 1) {
             return this.columns.parent().height();
@@ -164,7 +164,7 @@ heights:
             // scrolling behaves normally if columns are too close in
             // height, or if the plugin has been temporarily disabled
             inner.css({
-                position: 'relative',
+                position: '',
                 top: 0,
                 left: 0
             });
