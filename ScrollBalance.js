@@ -109,7 +109,7 @@ heights:
 
         this.columns.each(function() {
             var col = $(this),
-                original_height = col.height(),
+                // original_height = col.height(),
                 inner = $('<div>').addClass(INNER_CLASSNAME)
                                   .append(col.children());
 
@@ -117,7 +117,7 @@ heights:
             if (col.css('position') === 'static') {
                 col.css('position', 'relative');
             }
-            inner.css('minHeight', original_height);
+            // inner.css('minHeight', original_height);
         });
     };
     ScrollBalance.prototype.container_height = function() {
