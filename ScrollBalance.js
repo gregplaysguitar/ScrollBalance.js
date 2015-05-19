@@ -1,5 +1,11 @@
 /*
 
+A jQuery plugin that intelligently uses position: fixed to combat unsightly 
+gaps in multi-column layouts, when columns are of different heights. See
+https://github.com/gregplaysguitar/ScrollBalance.js 
+
+License: https://github.com/gregplaysguitar/ScrollBalance.js/blob/master/license.txt
+
 Example usage, where .mycolumn elements are floated columns of differing
 heights:
 
