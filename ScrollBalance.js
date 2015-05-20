@@ -1,17 +1,15 @@
-/*
+/*!
+ * ScrollBalance.js v1.1.0
+ * http://jquery.com/
+ * 
+ * Uses position: fixed to combat unsightly gaps in multi-column layouts, 
+ * when columns are of different heights.
+ * 
+ * Copyright 2011 Greg Brown
+ * https://github.com/gregplaysguitar/ScrollBalance.js/blob/master/license.txt
+ *
+ */
 
-A jQuery plugin that intelligently uses position: fixed to combat unsightly 
-gaps in multi-column layouts, when columns are of different heights. See
-https://github.com/gregplaysguitar/ScrollBalance.js 
-
-License: https://github.com/gregplaysguitar/ScrollBalance.js/blob/master/license.txt
-
-Example usage, where .mycolumn elements are floated columns of differing
-heights:
-
-    $('.mycolumn').scrollbalance();
-
-*/
 
 (function($) {
     var INNER_CLASSNAME = 'scrollbalance-inner';
