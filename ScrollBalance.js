@@ -106,9 +106,11 @@
         this.columns.each(function() {
             var col = $(this),
                 inner = col.find('.' + INNER_CLASSNAME);
-
-            inner.children().appendTo(col);
-            inner.remove();
+            
+            if (inner.data('sb-created')) {
+                inner.children().appendTo(col);
+                inner.remove();
+            }
             col.css({
                 position: '',
                 height: ''
@@ -118,23 +120,26 @@
 
     // "PRIVATE" METHODS:
     setup: function() {
-        /* Append an "inner" element to each column, and move the 
-           column's content into this element, so that the content's
-           vertical position can be controlled independently of the 
+        /* Append an "inner" element to each column, if it isn't already there,
+           and move the column's content into this element, so that the 
+           content's vertical position can be controlled independently of the 
            column's (usually floated) position. 
            Should only be called once, on setup. */
 
         this.columns.each(function() {
             var col = $(this),
-                // original_height = col.height(),
+                inner = col.find('.' + INNER_CLASSNAME);
+            
+            if (!inner.length) {
                 inner = $('<div>').addClass(INNER_CLASSNAME)
-                                  .append(col.children());
+                                  .append(col.children())
+                                  .data('sb-created', true);
+                col.html('').append(inner);
+            }
 
-            col.html('').append(inner);
             if (col.css('position') === 'static') {
                 col.css('position', 'relative');
             }
-            // inner.css('minHeight', original_height);
         });
     },
     container_height: function() {

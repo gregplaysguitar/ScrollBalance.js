@@ -51,6 +51,12 @@ Advanced example:
     });
     scrollbalance.bind();
 
+### Column wrapper div
+
+To avoid changing the position of the columns, ScrollBalance.js creates a 
+wrapper div inside each, and appends the column content dynamically. To avoid
+this, wrap the column content in a div with the class scrollbalance-inner and
+this will be used instead. The div should have no styling.
 
 ### Dynamic content
 
