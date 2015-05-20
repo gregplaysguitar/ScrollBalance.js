@@ -37,13 +37,16 @@ heights:
         this.setup();
     };
 
+    ScrollBalance.prototype = {
+    
     // "PUBLIC" METHODS:
-    ScrollBalance.prototype.initialise = function() {
+    initialise: function() {
         /* Position each column inner absolutely within the column,
            and set the column heights, since their content is now
            positioned absolutely.
            Should be called whenever column content changes, or window
            is resized. */
+        
         this.columns.each(function() {
             var col = $(this),
                 inner = col.find('.' + INNER_CLASSNAME);
@@ -51,8 +54,7 @@ heights:
                 width: col.width() + 'px',
                 position: 'absolute',
                 top: 0,
-                left: 0,
-                paddingLeft: col.css('paddingLeft')
+                left: 0
             });
             if (col.css('box-sizing') === 'border-box') {
                 col.height(inner.height());
@@ -62,34 +64,33 @@ heights:
             }
         });
         this.balance_all();
-    };
-    ScrollBalance.prototype.bind = function() {
+    bind: function() {
         /* Bind scrollbalance handlers to the scroll and resize events */
         var that = this;
         $(window).on('resize.scrollbalance', function() {
-            that.initialise();
+            that.resize($(window).width(), $(window).height());
         });
         $(window).on('scroll.scrollbalance', function() {
-            that.balance_all();
+            that.scroll($(window).scrollTop(), $(window).scrollLeft());
         });
-    };
-    ScrollBalance.prototype.unbind = function() {
+    },
+    unbind: function() {
         /* Unbind all scrollbalance handlers. */
         var that = this;
         $(window).off('resize.scrollbalance');
         $(window).off('scroll.scrollbalance');
-    };
-    ScrollBalance.prototype.disable = function() {
+    },
+    disable: function() {
         /* Temporarily disable scrollbalance */
         this.balance_enabled = false;
         this.balance_all();
     },
-    ScrollBalance.prototype.enable = function() {
+    enable: function() {
         /* Re-enable scrollbalance */
         this.balance_enabled = true;
         this.balance_all();
     },
-    ScrollBalance.prototype.teardown = function() {
+    teardown: function() {
         /* Remove all traces of scrollbalance from the content */
 
         this.columns.each(function() {
@@ -103,10 +104,10 @@ heights:
                 height: ''
             });
         });
-    };
+    },
 
     // "PRIVATE" METHODS:
-    ScrollBalance.prototype.setup = function() {
+    setup: function() {
         /* Append an "inner" element to each column, and move the 
            column's content into this element, so that the content's
            vertical position can be controlled independently of the 
@@ -125,8 +126,8 @@ heights:
             }
             // inner.css('minHeight', original_height);
         });
-    };
-    ScrollBalance.prototype.container_height = function() {
+    },
+    container_height: function() {
         /* Calculates the maximum column height, i.e. how high the 
            container should be. (Don't assume the user is using a
            clearfix hack on their container). If there's only one
@@ -141,14 +142,14 @@ heights:
             height = Math.max(height, $(this).outerHeight(true))
         });
         return height;
-    };
-    ScrollBalance.prototype.top = function() {
+    },
+    top: function() {
         /* Return columns' top offset - assume they're all the same in this
            regard. */
         return this.columns.offset().top;
-    };
+    },
 
-    ScrollBalance.prototype.balance = function(col) {
+    balance: function(col) {
         /* Using the scroll position, container offset, and column 
            height, determine whether the column should be fixed or
            absolute, and position it accordingly. */
@@ -229,12 +230,14 @@ heights:
                 });
             }
         }
-    };
-    ScrollBalance.prototype.balance_all = function() {
+    },
+    balance_all: function() {
         /* Balance all columns */
         for (var i = 0; i < this.columns.length; i++) {
             this.balance(this.columns.eq(i));
         }
+    }
+    
     };
 
 
