@@ -64,6 +64,16 @@ heights:
             }
         });
         this.balance_all();
+    },
+    resize: function(win_width, win_height) {
+        this.win_height = win_height;
+        this.initialise();
+    },
+    scroll: function(scroll_top, scroll_left) {
+        this.scroll_top = scroll_top;
+        this.scroll_left = scroll_left;
+        this.balance_all();
+    },
     bind: function() {
         /* Bind scrollbalance handlers to the scroll and resize events */
         var that = this;
@@ -73,6 +83,8 @@ heights:
         $(window).on('scroll.scrollbalance', function() {
             that.scroll($(window).scrollTop(), $(window).scrollLeft());
         });
+        $(window).trigger('resize');
+        $(window).trigger('scroll');
     },
     unbind: function() {
         /* Unbind all scrollbalance handlers. */
@@ -156,6 +168,7 @@ heights:
 
         var inner = col.find('.' + INNER_CLASSNAME),
             col_height = col.outerHeight(true),
+            padding_left = col.css('paddingLeft'),
 
             // determine the largest distance the column can be offset
             // vertically
@@ -165,7 +178,7 @@ heights:
             // or if the column is shorter than the window
             pin_filter = this.settings.pinTopFilter,
             pin_top = pin_filter && col.is(pin_filter) ||
-                      (col_height < $(window).height());
+                      (col_height < this.win_height);
 
         if (max_scroll < this.settings.threshold || !this.balance_enabled) {
             // scrolling behaves normally if columns are too close in
@@ -173,7 +186,8 @@ heights:
             inner.css({
                 position: '',
                 top: 0,
-                left: 0
+                left: 0,
+                paddingLeft: 0
             });
         }
         else {
@@ -181,12 +195,11 @@ heights:
             // column content positioning. This changes depending on whether 
             // the content is pinned to the top or bottom
             if (pin_top) {
-                var raw_scroll = $(window).scrollTop() - this.top() + 
+                var raw_scroll = this.scroll_top - this.top() + 
                                  this.settings.topBuffer;
             }
             else {
-                var raw_scroll = ($(window).height() + 
-                                  $(window).scrollTop()) - 
+                var raw_scroll = (this.win_height + this.scroll_top) - 
                                   (this.top() + col_height);
             }
             var scroll = Math.max(
@@ -196,19 +209,20 @@ heights:
                     raw_scroll
                 )
             );
-
+            
             if (scroll && scroll < max_scroll) {
                 // container straddles viewport, so container position
                 // is fixed, either at top or bottom depending on 
                 // pin_top
                 var fix_top = pin_top ? this.settings.topBuffer :
-                                $(window).height() - col_height,
+                                this.win_height - col_height,
                     fix_left = col.offset().left + 
                                (parseInt(col.css('borderLeftWidth')) || 0);
                 inner.css({
                     position: 'fixed',
                     top: fix_top + 'px',
-                    left: fix_left - $(window).scrollLeft() + 'px'
+                    left: fix_left - this.scroll_left + 'px',
+                    paddingLeft: padding_left
                 });
             }
             else if (scroll) {
@@ -217,7 +231,8 @@ heights:
                 inner.css({
                     position: 'absolute',
                     top: max_scroll + 'px',
-                    left: 0
+                    left: 0,
+                    paddingLeft: padding_left
                 });
             }
             else {
@@ -226,7 +241,8 @@ heights:
                 inner.css({
                     position: 'absolute',
                     top: 0,
-                    left: 0
+                    left: 0,
+                    paddingLeft: padding_left
                 });
             }
         }
