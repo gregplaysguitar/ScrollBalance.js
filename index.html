@@ -37,9 +37,10 @@
         .wrap .column em {
             color: #222;
         }
-        .wrap .column a {
+        a {
             cursor: pointer;
             text-decoration: underline;
+            color: #aaa;
         }
         footer {
             margin: 0 10px 50px;
@@ -49,16 +50,29 @@
     </style>
     <script type="text/javascript">
         $(function() {
-            $('.wrap .column').scrollbalance();
-            
-            var api = $('.wrap .column').data('scrollbalance');
-            
+            var cols = $('.wrap .column'),
+                enabled = true,
+                scrollbalance = new ScrollBalance(cols);
+          
             $('<a>').text('Add content').click(function() {
                 var p = $(this).parent().find('p').eq(-1);
                 p.clone().insertAfter(p);
-                api.initialise();
+                scrollbalance.initialise();
             }).insertAfter($('.wrap .column h3'));
-            api.initialise();
+            scrollbalance.bind();
+            
+            $('a.toggle').on('click', function() {
+              if (enabled) {
+                enabled = false;
+                scrollbalance.disable();
+                $('a.toggle span').text('Enable');
+              }
+              else {
+                enabled = true;
+                scrollbalance.enable();
+                $('a.toggle span').text('Disable');
+              }
+            });
         });
     </script>
   </head>
@@ -66,15 +80,23 @@
       <div id="container">
             <h1 id="banner">Scroll Balance Demo</h1>
             <section class="info">
-                <h4>Usage:</h4>
+                <h4>Code:</h4>
                 <pre>
-$(function() {
-    $('.wrap').scrollbalance();
-});
+&lt;script type="text/javascript">
+    $(function() {
+        var cols = $('.wrap .column'),
+            scrollbalance = new ScrollBalance(cols);
+      
+        scrollbalance.bind();
+    });
+&lt;/script>
                 </pre>
                 
                 <p>
                     Scroll down the page to see the demo in action. 
+                </p>
+                <p>
+                    <a class="toggle"><span>Disable</span> ScrollBalance</a>
                 </p>
             </section>
             
