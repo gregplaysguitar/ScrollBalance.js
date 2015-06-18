@@ -61,6 +61,7 @@
                 col.height(inner.outerHeight(true));
             }
         });
+        this.set_container_height();
         this.balance_all();
     },
     resize: function(win_width, win_height) {
@@ -142,7 +143,7 @@
             }
         });
     },
-    container_height: function() {
+    set_container_height: function() {
         /* Calculates the maximum column height, i.e. how high the 
            container should be. (Don't assume the user is using a
            clearfix hack on their container). If there's only one
@@ -154,16 +155,15 @@
         
         var height = 0;
         this.columns.each(function() {
-            height = Math.max(height, $(this).outerHeight(true))
+            height = Math.max(height, $(this).outerHeight(true));
         });
-        return height;
+        this.container_height = height;
     },
     top: function() {
         /* Return columns' top offset - assume they're all the same in this
            regard. */
         return this.columns.offset().top;
     },
-
     balance: function(col) {
         /* Using the scroll position, container offset, and column 
            height, determine whether the column should be fixed or
@@ -175,7 +175,7 @@
 
             // determine the largest distance the column can be offset
             // vertically
-            max_scroll = this.container_height() - col_height,
+            max_scroll = this.container_height - col_height,
 
             // pin the column to the top if it matches a supplied filter,
             // or if the column is shorter than the window
