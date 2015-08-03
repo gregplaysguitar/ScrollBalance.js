@@ -55,7 +55,9 @@
                 width: col.width() + 'px',
                 position: 'absolute',
                 top: 0,
-                left: 0
+                left: 0,
+                paddingTop: col.css('paddingTop'),
+                paddingLeft: col.css('paddingLeft')
             });
             if (col.css('box-sizing') === 'border-box') {
                 col.height(inner.height());
@@ -70,6 +72,7 @@
     resize: function(win_width, win_height) {
         this.win_height = win_height;
         this.initialise();
+        
         if (this.settings.minwidth !== null) {
             if (this.balance_enabled && win_width < this.settings.minwidth) {
                 this.disable();
@@ -162,14 +165,15 @@
            column, use the parent height. */
         
         if (this.columns.length === 1) {
-            return this.columns.parent().height();
+            this.container_height = this.columns.parent().height();
         }
-        
-        var height = 0;
-        this.columns.each(function() {
-            height = Math.max(height, $(this).outerHeight(true));
-        });
-        this.container_height = height;
+        else {
+            var height = 0;
+            this.columns.each(function() {
+                height = Math.max(height, $(this).outerHeight(true));
+            });
+            this.container_height = height;
+        }
     },
     top: function() {
         /* Return columns' top offset - assume they're all the same in this
@@ -206,12 +210,14 @@
             });
         }
         else {
+            var top_buffer = this.settings.topBuffer + 
+                             parseInt(col.css('marginTop'));
+            
             // convert scrollTop to a value we can use to determine
             // column content positioning. This changes depending on whether 
             // the content is pinned to the top or bottom
             if (pin_top) {
-                var raw_scroll = this.scroll_top - this.top() + 
-                                 this.settings.topBuffer;
+                var raw_scroll = this.scroll_top - this.top() + top_buffer;
             }
             else {
                 var raw_scroll = (this.win_height + this.scroll_top) - 
@@ -229,7 +235,7 @@
                 // container straddles viewport, so container position
                 // is fixed, either at top or bottom depending on 
                 // pin_top
-                var fix_top = pin_top ? this.settings.topBuffer :
+                var fix_top = pin_top ? top_buffer :
                                 this.win_height - col_height,
                     fix_left = col.offset().left + 
                                (parseInt(col.css('borderLeftWidth')) || 0);
