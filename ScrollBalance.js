@@ -27,7 +27,10 @@
 
             // filter for columns which should be pinned to the top, even if
             // taller than the viewport
-            pinTopFilter: null
+            pinTopFilter: null,
+            
+            // disable the plugin if the screen width is less than this
+            minwidth: null
         }, options);
 
         this.balance_enabled = true;
@@ -67,6 +70,15 @@
     resize: function(win_width, win_height) {
         this.win_height = win_height;
         this.initialise();
+        if (this.settings.minwidth !== null) {
+            if (this.balance_enabled && win_width < this.settings.minwidth) {
+                this.disable();
+            }
+            else if (!this.balance_enabled && 
+                     win_width >= this.settings.minwidth) {
+                this.enable();
+            }
+        }
     },
     scroll: function(scroll_top, scroll_left) {
         this.scroll_top = scroll_top;
