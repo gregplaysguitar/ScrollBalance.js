@@ -153,9 +153,6 @@
                 col.html('').append(inner);
             }
 
-            if (col.css('position') === 'static') {
-                col.css('position', 'relative');
-            }
         });
     },
     set_container_height: function() {
@@ -202,15 +199,20 @@
         if (max_scroll < this.settings.threshold || !this.balance_enabled) {
             // scrolling behaves normally if columns are too close in
             // height, or if the plugin has been temporarily disabled
+            col.css({
+                position: '',
+            });
             inner.css({
                 position: '',
                 top: 0,
                 left: 0,
                 paddingLeft: 0
             });
-        }
-        else {
-            var top_buffer = this.settings.topBuffer + 
+        } else {
+            if (col.css('position') === 'static') {
+                col.css('position', 'relative');
+            }
+            var top_buffer = this.settings.topBuffer +
                              parseInt(col.css('marginTop'));
             
             // convert scrollTop to a value we can use to determine
