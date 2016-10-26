@@ -60,7 +60,7 @@ this will be used instead. The div should have no styling.
 
 ### Dynamic content
 
-If your column heights change dynamically, you'll need to call the reinitialise
+If your column heights change dynamically, you'll need to call the initialise
 method - for example:
 
     var scrollbalance = new ScrollBalance($('.column'));
@@ -68,7 +68,7 @@ method - for example:
     // add some content here
     ...
     
-    scrollbalance.reinitialise();
+    scrollbalance.initialise();
 
 
 ### Temporarily disabling the plugin
