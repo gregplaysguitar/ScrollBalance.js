@@ -189,7 +189,7 @@
       var pin_top = pin_filter && col.is(pin_filter) ||
           (col_height < this.win_height);
 
-      if (max_scroll < this.settings.threshold || !this.balance_enabled) {
+      if (!this.balance_enabled) {
         // scrolling behaves normally if columns are too close in
         // height, or if the plugin has been temporarily disabled
         col.css({
@@ -201,12 +201,18 @@
           left: 0,
           paddingLeft: 0
         });
+      } else if (max_scroll < this.settings.threshold) {
+        // do nothing
       } else {
         if (col.css('position') === 'static') {
           col.css('position', 'relative');
         }
         var top_buffer = this.settings.topBuffer +
           parseInt(col.css('marginTop'), 10);
+
+        // store current state, so we don't write to the dom on 
+        // every scroll event
+        var current_state = inner.css('position');
 
         // convert scrollTop to a value we can use to determine
         // column content positioning. This changes depending on whether
@@ -230,34 +236,40 @@
           // container straddles viewport, so container position
           // is fixed, either at top or bottom depending on
           // pin_top
-          var fix_top = pin_top ? top_buffer
-                                : this.win_height - col_height;
-          var fix_left = col.offset().left +
-              (parseInt(col.css('borderLeftWidth'), 10) || 0);
-          inner.css({
-            position: 'fixed',
-            top: fix_top + 'px',
-            left: fix_left - this.scroll_left + 'px',
-            paddingLeft: padding_left
-          });
+          if (current_state !== 'fixed') {
+            var fix_top = pin_top ? top_buffer
+                                  : this.win_height - col_height;
+            var fix_left = col.offset().left +
+                (parseInt(col.css('borderLeftWidth'), 10) || 0);
+            inner.css({
+              position: 'fixed',
+              top: fix_top + 'px',
+              left: fix_left - this.scroll_left + 'px',
+              paddingLeft: padding_left
+            });
+          }
         } else if (scroll) {
           // bottom of container is above bottom of viewport, so
           // position content at the bottom of the column
-          inner.css({
-            position: 'absolute',
-            top: max_scroll + 'px',
-            left: 0,
-            paddingLeft: padding_left
-          });
+          if (current_state !== 'absolute') {
+            inner.css({
+              position: 'absolute',
+              top: max_scroll + 'px',
+              left: 0,
+              paddingLeft: padding_left
+            });
+          }
         } else {
           // top of container is below top of viewport, so
           // position content at the top of the column
-          inner.css({
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            paddingLeft: padding_left
-          });
+          if (current_state !== 'absolute') {
+            inner.css({
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              paddingLeft: padding_left
+            });
+          }
         }
       }
     },
