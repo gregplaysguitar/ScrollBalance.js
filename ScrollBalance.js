@@ -1,5 +1,5 @@
 /*!
- * ScrollBalance.js v1.1.0
+ * ScrollBalance.js v1.1.1
  * http://jquery.com/
  *
  * Uses position: fixed to combat unsightly gaps in multi-column layouts,
@@ -15,6 +15,7 @@
 
   function ScrollBalance (columns, options) {
     this.columns = columns;
+    this.columnData = [];
     this.settings = $.extend({
       // distance to maintain between the top of the stationary element
       // and the top of the container.
@@ -46,7 +47,10 @@
          Should be called whenever column content changes, or window
          is resized. */
 
-      this.columns.each(function () {
+      var that = this;
+      var pinFilter = this.settings.pinTopFilter;
+
+      this.columns.each(function (i) {
         var col = $(this);
         var inner = col.find('.' + INNER_CLASSNAME);
         inner.css({
@@ -54,15 +58,38 @@
           position: 'absolute',
           top: 0,
           left: 0,
+          transform: 'translateZ(0px)',
           paddingTop: col.css('paddingTop'),
           paddingLeft: col.css('paddingLeft')
         });
+        if (col.css('position') === 'static') {
+          col.css('position', 'relative');
+        }
         if (col.css('box-sizing') === 'border-box') {
           col.height(inner.height());
         } else {
           col.height(inner.outerHeight(true));
         }
+
+        // save column data to avoid hitting the DOM on scroll
+        if (!that.columnData[i]) {
+          that.columnData[i] = {};
+        }
+        that.columnData[i].paddingLeft = col.css('paddingLeft');
+        that.columnData[i].height = col.outerHeight(true);
+        that.columnData[i].marginTop = parseInt(col.css('marginTop'), 10);
+        that.columnData[i].fixLeft = col.offset().left +
+          (parseInt(col.css('borderLeftWidth'), 10) || 0);
+
+        // pin the column to the top if it matches a supplied filter,
+        // or if the column is shorter than the window
+        that.columnData[i].pinTop = pinFilter && col.is(pinFilter) ||
+          (that.columnData[i].height < this.win_height);
       });
+
+      // Set column top offset - assume they're all the same
+      this.columnTop = this.columns.eq(0).offset().top;
+
       this.set_container_height();
       this.balance_all();
     },
@@ -165,106 +192,87 @@
         this.container_height = height;
       }
     },
-    top: function () {
-      /* Return columns' top offset - assume they're all the same in this
-         regard. */
-      return this.columns.offset().top;
-    },
-    balance: function (col) {
+    balance: function (col, columnData) {
       /* Using the scroll position, container offset, and column
          height, determine whether the column should be fixed or
          absolute, and position it accordingly. */
 
-      var inner = col.find('.' + INNER_CLASSNAME);
-      var col_height = col.outerHeight(true);
-      var padding_left = col.css('paddingLeft');
+      var state;
+      var topBuffer = this.settings.topBuffer + columnData.marginTop;
+      var maxScroll = this.container_height - columnData.height;
 
-      // determine the largest distance the column can be offset
-      // vertically
-      var max_scroll = this.container_height - col_height;
-
-      // pin the column to the top if it matches a supplied filter,
-      // or if the column is shorter than the window
-      var pin_filter = this.settings.pinTopFilter;
-      var pin_top = pin_filter && col.is(pin_filter) ||
-          (col_height < this.win_height);
-
-      if (max_scroll < this.settings.threshold || !this.balance_enabled) {
-        // scrolling behaves normally if columns are too close in
-        // height, or if the plugin has been temporarily disabled
-        col.css({
-          position: ''
-        });
-        inner.css({
-          position: '',
-          top: 0,
-          left: 0,
-          paddingLeft: 0
-        });
+      if (maxScroll < this.settings.threshold || !this.balance_enabled) {
+        state = 'disabled';
       } else {
-        if (col.css('position') === 'static') {
-          col.css('position', 'relative');
-        }
-        var top_buffer = this.settings.topBuffer +
-          parseInt(col.css('marginTop'), 10);
-
         // convert scrollTop to a value we can use to determine
         // column content positioning. This changes depending on whether
         // the content is pinned to the top or bottom
-        var raw_scroll;
-        if (pin_top) {
-          raw_scroll = this.scroll_top - this.top() + top_buffer;
+        var rawScroll;
+        if (columnData.pinTop) {
+          rawScroll = this.scroll_top - this.columnTop + topBuffer;
         } else {
-          raw_scroll = (this.win_height + this.scroll_top) -
-            (this.top() + col_height);
+          rawScroll = (this.win_height + this.scroll_top) -
+            (this.columnTop + columnData.height);
         }
-        var scroll = Math.max(
-          0,
-          Math.min(
-            max_scroll,
-            raw_scroll
-          )
-        );
+        var scroll = Math.max(0, Math.min(maxScroll, rawScroll));
 
-        if (scroll && scroll < max_scroll) {
+        if (scroll && scroll < maxScroll) {
           // container straddles viewport, so container position
           // is fixed, either at top or bottom depending on
           // pin_top
-          var fix_top = pin_top ? top_buffer
-                                : this.win_height - col_height;
-          var fix_left = col.offset().left +
-              (parseInt(col.css('borderLeftWidth'), 10) || 0);
-          inner.css({
-            position: 'fixed',
-            top: fix_top + 'px',
-            left: fix_left - this.scroll_left + 'px',
-            paddingLeft: padding_left
-          });
+          state = 'fixed';
         } else if (scroll) {
           // bottom of container is above bottom of viewport, so
           // position content at the bottom of the column
-          inner.css({
-            position: 'absolute',
-            top: max_scroll + 'px',
-            left: 0,
-            paddingLeft: padding_left
-          });
+          state = 'bottom';
         } else {
           // top of container is below top of viewport, so
           // position content at the top of the column
+          state = 'top';
+        }
+      }
+
+      // update column positioning only if changed
+      if (columnData.state !== state) {
+        var inner = col.find('.' + INNER_CLASSNAME);
+        if (state === 'disabled') {
+          inner.css({
+            position: '',
+            top: 0,
+            left: 0,
+            paddingLeft: 0
+          });
+        } else if (state === 'fixed') {
+          var fixTop = columnData.pinTop ? topBuffer
+                                         : this.win_height - columnData.height;
+          inner.css({
+            position: 'fixed',
+            top: fixTop,
+            left: columnData.fixLeft - this.scroll_left,
+            paddingLeft: columnData.paddingLeft
+          });
+        } else if (state === 'bottom') {
+          inner.css({
+            position: 'absolute',
+            top: maxScroll + 'px',
+            left: 0,
+            paddingLeft: columnData.paddingLeft
+          });
+        } else if (state === 'top') {
           inner.css({
             position: 'absolute',
             top: 0,
             left: 0,
-            paddingLeft: padding_left
+            paddingLeft: columnData.paddingLeft
           });
         }
+        columnData.state = state;
       }
     },
     balance_all: function () {
       /* Balance all columns */
       for (var i = 0; i < this.columns.length; i++) {
-        this.balance(this.columns.eq(i));
+        this.balance(this.columns.eq(i), this.columnData[i]);
       }
     }
 
