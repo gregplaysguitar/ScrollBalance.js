@@ -55,12 +55,9 @@
         var inner = col.find('.' + INNER_CLASSNAME);
         inner.css({
           width: col.width() + 'px',
-          position: 'absolute',
-          top: 0,
-          left: 0,
           transform: 'translateZ(0px)',
-          paddingTop: col.css('paddingTop'),
-          paddingLeft: col.css('paddingLeft')
+          paddingTop: col.css('paddingTop')
+          // other css for this element is handled in balance()
         });
         if (col.css('position') === 'static') {
           col.css('position', 'relative');
@@ -91,7 +88,7 @@
       this.columnTop = this.columns.eq(0).offset().top;
 
       this.set_container_height();
-      this.balance_all();
+      this.balance_all(true);
     },
     resize: function (win_width, win_height) {
       this.win_height = win_height;
@@ -192,7 +189,7 @@
         this.container_height = height;
       }
     },
-    balance: function (col, columnData) {
+    balance: function (col, columnData, force) {
       /* Using the scroll position, container offset, and column
          height, determine whether the column should be fixed or
          absolute, and position it accordingly. */
@@ -233,7 +230,7 @@
       }
 
       // update column positioning only if changed
-      if (columnData.state !== state) {
+      if (columnData.state !== state || force) {
         var inner = col.find('.' + INNER_CLASSNAME);
         if (state === 'disabled') {
           inner.css({
@@ -269,10 +266,10 @@
         columnData.state = state;
       }
     },
-    balance_all: function () {
+    balance_all: function (force) {
       /* Balance all columns */
       for (var i = 0; i < this.columns.length; i++) {
-        this.balance(this.columns.eq(i), this.columnData[i]);
+        this.balance(this.columns.eq(i), this.columnData[i], force);
       }
     }
 
