@@ -105,15 +105,9 @@
       this.win_height = win_height;
 
       if (this.settings.minwidth !== null) {
-        if (this.balance_enabled && win_width < this.settings.minwidth) {
-          this.disable();
-        } else if (!this.balance_enabled &&
-          win_width >= this.settings.minwidth) {
-          this.enable();
-        }
-      } else {
-        this.initialise();
+        this.balance_enabled = (win_width >= this.settings.minwidth);
       }
+      this.initialise();
     },
     scroll: function (scroll_top, scroll_left) {
       this.scroll_top = scroll_top;
