@@ -1,5 +1,5 @@
 /*!
- * ScrollBalance.js v1.1.1
+ * ScrollBalance.js v1.1.2
  * http://jquery.com/
  *
  * Uses position: fixed to combat unsightly gaps in multi-column layouts,
@@ -53,19 +53,30 @@
       this.columns.each(function (i) {
         var col = $(this);
         var inner = col.find('.' + INNER_CLASSNAME);
-        inner.css({
-          width: col.width() + 'px',
-          transform: 'translateZ(0px)',
-          paddingTop: col.css('paddingTop')
-          // other css for this element is handled in balance()
-        });
-        if (col.css('position') === 'static') {
-          col.css('position', 'relative');
-        }
-        if (col.css('box-sizing') === 'border-box') {
-          col.height(inner.height());
+
+        if (that.balance_enabled) {
+          inner.css({
+            width: col.width() + 'px',
+            transform: 'translateZ(0px)',
+            paddingTop: col.css('paddingTop')
+            // other css for this element is handled in balance()
+          });
+          if (col.css('position') === 'static') {
+            col.css('position', 'relative');
+          }
+          if (col.css('box-sizing') === 'border-box') {
+            col.height(inner.height());
+          } else {
+            col.height(inner.outerHeight(true));
+          }
         } else {
-          col.height(inner.outerHeight(true));
+          // reset state
+          inner.css({
+            width: '',
+            transform: '',
+            paddingTop: ''
+          });
+          col.height('');
         }
 
         // save column data to avoid hitting the DOM on scroll
@@ -92,7 +103,6 @@
     },
     resize: function (win_width, win_height) {
       this.win_height = win_height;
-      this.initialise();
 
       if (this.settings.minwidth !== null) {
         if (this.balance_enabled && win_width < this.settings.minwidth) {
@@ -101,6 +111,8 @@
           win_width >= this.settings.minwidth) {
           this.enable();
         }
+      } else {
+        this.initialise();
       }
     },
     scroll: function (scroll_top, scroll_left) {
@@ -128,12 +140,12 @@
     disable: function () {
       /* Temporarily disable scrollbalance */
       this.balance_enabled = false;
-      this.balance_all();
+      this.initialise();
     },
     enable: function () {
       /* Re-enable scrollbalance */
       this.balance_enabled = true;
-      this.balance_all();
+      this.initialise();
     },
     teardown: function () {
       /* Remove all traces of scrollbalance from the content */
@@ -269,10 +281,11 @@
     balance_all: function (force) {
       /* Balance all columns */
       for (var i = 0; i < this.columns.length; i++) {
-        this.balance(this.columns.eq(i), this.columnData[i], force);
+        if (this.columnData[i]) {
+          this.balance(this.columns.eq(i), this.columnData[i], force);
+        }
       }
     }
-
   };
 
   // export as jquery plugin
