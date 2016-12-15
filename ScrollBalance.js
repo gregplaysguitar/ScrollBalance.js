@@ -92,7 +92,7 @@
         // pin the column to the top if it matches a supplied filter,
         // or if the column is shorter than the window
         that.columnData[i].pinTop = pinFilter && col.is(pinFilter) ||
-          (that.columnData[i].height < this.winHeight);
+          (that.columnData[i].height < that.winHeight);
       });
 
       // Set column top offset - assume they're all the same
