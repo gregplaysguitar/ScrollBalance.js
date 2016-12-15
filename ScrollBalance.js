@@ -105,15 +105,9 @@
       this.winHeight = winHeight;
 
       if (this.settings.minwidth !== null) {
-        if (this.balance_enabled && winWidth < this.settings.minwidth) {
-          this.disable();
-        } else if (!this.balance_enabled &&
-          winWidth >= this.settings.minwidth) {
-          this.enable();
-        }
-      } else {
-        this.initialise();
+        this.balance_enabled = (winWidth >= this.settings.minwidth);
       }
+      this.initialise();
     },
     scroll: function (scrollTop, scrollLeft) {
       this.scrollTop = scrollTop;
