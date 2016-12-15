@@ -92,7 +92,7 @@
         // pin the column to the top if it matches a supplied filter,
         // or if the column is shorter than the window
         that.columnData[i].pinTop = pinFilter && col.is(pinFilter) ||
-          (that.columnData[i].height < this.win_height);
+          (that.columnData[i].height < this.winHeight);
       });
 
       // Set column top offset - assume they're all the same
@@ -101,23 +101,23 @@
       this.set_container_height();
       this.balance_all(true);
     },
-    resize: function (win_width, win_height) {
-      this.win_height = win_height;
+    resize: function (winWidth, winHeight) {
+      this.winHeight = winHeight;
 
       if (this.settings.minwidth !== null) {
-        if (this.balance_enabled && win_width < this.settings.minwidth) {
+        if (this.balance_enabled && winWidth < this.settings.minwidth) {
           this.disable();
         } else if (!this.balance_enabled &&
-          win_width >= this.settings.minwidth) {
+          winWidth >= this.settings.minwidth) {
           this.enable();
         }
       } else {
         this.initialise();
       }
     },
-    scroll: function (scroll_top, scroll_left) {
-      this.scroll_top = scroll_top;
-      this.scroll_left = scroll_left;
+    scroll: function (scrollTop, scrollLeft) {
+      this.scrollTop = scrollTop;
+      this.scrollLeft = scrollLeft;
       this.balance_all();
     },
     bind: function () {
@@ -218,9 +218,9 @@
         // the content is pinned to the top or bottom
         var rawScroll;
         if (columnData.pinTop) {
-          rawScroll = this.scroll_top - this.columnTop + topBuffer;
+          rawScroll = this.scrollTop - this.columnTop + topBuffer;
         } else {
-          rawScroll = (this.win_height + this.scroll_top) -
+          rawScroll = (this.winHeight + this.scrollTop) -
             (this.columnTop + columnData.height);
         }
         var scroll = Math.max(0, Math.min(maxScroll, rawScroll));
@@ -253,11 +253,11 @@
           });
         } else if (state === 'fixed') {
           var fixTop = columnData.pinTop ? topBuffer
-                                         : this.win_height - columnData.height;
+                                         : this.winHeight - columnData.height;
           inner.css({
             position: 'fixed',
             top: fixTop,
-            left: columnData.fixLeft - this.scroll_left,
+            left: columnData.fixLeft - this.scrollLeft,
             paddingLeft: columnData.paddingLeft
           });
         } else if (state === 'bottom') {
