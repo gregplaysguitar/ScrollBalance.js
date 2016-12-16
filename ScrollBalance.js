@@ -41,34 +41,25 @@
 
       var that = this;
 
+      // Calculate the maximum column height, i.e. how high the container
+      // should be (don't assume the user is using a clearfix hack on their
+      // container), and the container offset. If there's only one column, use
+      // the parent for both calculations
+      if (this.columns.length === 1) {
+        this.containerHeight = this.columns.parent().height();
+        this.containerTop = this.columns.parent().offset().top;
+      } else {
+        var height = 0;
+        this.columns.each(function () {
+          height = Math.max(height, $(this).outerHeight(true));
+        });
+        this.containerHeight = height;
+        this.containerTop = this.columns.eq(0).offset().top;
+      }
+
       this.columns.each(function (i) {
         var col = $(this);
         var inner = col.find('.' + INNER_CLASSNAME);
-
-        if (that.balance_enabled) {
-          inner.css({
-            width: col.width() + 'px',
-            transform: 'translateZ(0px)',
-            paddingTop: col.css('paddingTop')
-            // other css for this element is handled in balance()
-          });
-          if (col.css('position') === 'static') {
-            col.css('position', 'relative');
-          }
-          if (col.css('box-sizing') === 'border-box') {
-            col.height(inner.height());
-          } else {
-            col.height(inner.outerHeight(true));
-          }
-        } else {
-          // reset state
-          inner.css({
-            width: '',
-            transform: '',
-            paddingTop: ''
-          });
-          col.height('');
-        }
 
         // save column data to avoid hitting the DOM on scroll
         if (!that.columnData[i]) {
@@ -77,26 +68,54 @@
             fixTop: 0
           };
         }
-        that.columnData[i].paddingLeft = col.css('paddingLeft');
-        that.columnData[i].height = col.outerHeight(true);
-        // that.columnData[i].marginTop = parseInt(col.css('marginTop'), 10);
-        that.columnData[i].fixLeft = col.offset().left +
+        var columnData = that.columnData[i];
+
+        // calculate actual height regardless of what it's previously been
+        // set to
+        columnData.height =
+          inner.height() +
+          parseInt(col.css('borderTop')) +
+          parseInt(col.css('paddingTop')) +
+          parseInt(col.css('paddingBottom')) +
+          parseInt(col.css('borderBottom'));
+
+        // disable if not enough difference in height between container and
+        // column
+        columnData.enabled = (that.containerHeight - columnData.height) >
+          that.settings.threshold;
+
+        columnData.fixLeft = col.offset().left +
           (parseInt(col.css('borderLeftWidth'), 10) || 0);
 
-        that.columnData[i].minFixTop = Math.min(
-          0, that.winHeight - that.columnData[i].height);
-        that.columnData[i].maxFixTop = 0;
+        columnData.minFixTop = Math.min(0, that.winHeight - columnData.height);
+        columnData.maxFixTop = 0;
 
         // uncomment this to have it stick to the bottom too rather than just
         // the top
-        // that.columnData[i].maxFixTop = Math.max(
-        //   0, that.winHeight - that.columnData[i].height);
+        // columnData.maxFixTop = Math.max(
+        //   0, that.winHeight - columnData.height);
+
+        if (that.balance_enabled && columnData.enabled) {
+          inner.css({
+            width: col.css('width'),
+            transform: 'translateZ(0px)',
+            padding: col.css('padding')
+            // other css for this element is handled in balance()
+          });
+          col.css({
+            height: inner.css('height')
+          });
+        } else {
+          // reset state
+          inner.css({
+            width: '',
+            transform: '',
+            padding: ''
+          });
+          col.height('');
+        }
       });
 
-      // Set column top offset - assume they're all the same
-      this.columnTop = this.columns.eq(0).offset().top;
-
-      this.set_containerHeight();
       this.balance_all(true);
     },
     resize: function (winWidth, winHeight) {
@@ -170,6 +189,10 @@
         var col = $(this);
         var inner = col.find('.' + INNER_CLASSNAME);
 
+        if (col.css('position') === 'static') {
+          col.css('position', 'relative');
+        }
+
         if (!inner.length) {
           inner = $('<div>').addClass(INNER_CLASSNAME)
             .append(col.children())
@@ -178,22 +201,6 @@
         }
       });
     },
-    set_containerHeight: function () {
-      /* Calculates the maximum column height, i.e. how high the
-         container should be. (Don't assume the user is using a
-         clearfix hack on their container). If there's only one
-         column, use the parent height. */
-
-      if (this.columns.length === 1) {
-        this.containerHeight = this.columns.parent().height();
-      } else {
-        var height = 0;
-        this.columns.each(function () {
-          height = Math.max(height, $(this).outerHeight(true));
-        });
-        this.containerHeight = height;
-      }
-    },
     balance: function (col, columnData, force, scrollDelta) {
       /* Using the scroll position, container offset, and column
          height, determine whether the column should be fixed or
@@ -201,13 +208,12 @@
 
       var state;
       var fixTop = columnData.fixTop;
-      var maxScroll = this.containerHeight - columnData.height;
 
       if (scrollDelta === undefined) {
         scrollDelta = 0;
       }
 
-      if (maxScroll < this.settings.threshold || !this.balance_enabled) {
+      if (!columnData.enabled || !this.balance_enabled) {
         state = 'disabled';
       } else {
         // determine state, one of
@@ -215,10 +221,13 @@
         // - bottom
         // - fixed
 
-        var topBreakpoint = this.columnTop - columnData.fixTop;
-        var bottomBreakpoint = this.columnTop + this.containerHeight -
-           this.winHeight + Math.max(
-             0, this.winHeight - columnData.height - columnData.fixTop);
+        var topBreakpoint = this.containerTop - columnData.fixTop;
+        // var bottomBreakpoint = this.containerTop + this.containerHeight -
+        //    this.winHeight + Math.max(
+        //      0, this.winHeight - columnData.height - columnData.fixTop);
+
+        var bottomBreakpoint = this.containerTop + this.containerHeight -
+          columnData.height - columnData.fixTop;
 
         if (this.scrollTop < topBreakpoint) {
           state = 'top';
@@ -238,24 +247,22 @@
         if (state === 'disabled') {
           inner.css({
             position: '',
-            top: 0,
-            left: 0,
-            paddingLeft: 0
+            top: '',
+            left: ''
           });
         } else if (state === 'fixed') {
           inner.css({
             position: 'fixed',
             top: fixTop,
-            left: columnData.fixLeft - this.scrollLeft,
-            paddingLeft: columnData.paddingLeft
+            left: columnData.fixLeft - this.scrollLeft
           });
         } else {
           // assume one of "bottom" or "top"
           inner.css({
             position: 'absolute',
-            top: (state === 'bottom' ? maxScroll : 0) + 'px',
-            left: 0,
-            paddingLeft: columnData.paddingLeft
+            top: (state === 'bottom' ? this.containerHeight -
+                  columnData.height : 0) + 'px',
+            left: 0
           });
         }
         columnData.fixTop = fixTop;
