@@ -17,24 +17,16 @@
     this.columns = columns;
     this.columnData = [];
     this.settings = $.extend({
-      // distance to maintain between the top of the stationary element
-      // and the top of the container.
-      topBuffer: 0,
-
       // threshold for activating the plugin, eg the column heights must
       // differ by at least this amount to be affected.
       threshold: 100,
-
-      // filter for columns which should be pinned to the top, even if
-      // taller than the viewport
-      pinTopFilter: null,
 
       // disable the plugin if the screen width is less than this
       minwidth: null
     }, options);
 
     this.balance_enabled = true;
-
+    this.scrollTop = 0;
     this.setup();
   }
 
@@ -48,7 +40,6 @@
          is resized. */
 
       var that = this;
-      var pinFilter = this.settings.pinTopFilter;
 
       this.columns.each(function (i) {
         var col = $(this);
@@ -81,24 +72,31 @@
 
         // save column data to avoid hitting the DOM on scroll
         if (!that.columnData[i]) {
-          that.columnData[i] = {};
+          that.columnData[i] = {
+            // default initial values here
+            fixTop: 0
+          };
         }
         that.columnData[i].paddingLeft = col.css('paddingLeft');
         that.columnData[i].height = col.outerHeight(true);
-        that.columnData[i].marginTop = parseInt(col.css('marginTop'), 10);
+        // that.columnData[i].marginTop = parseInt(col.css('marginTop'), 10);
         that.columnData[i].fixLeft = col.offset().left +
           (parseInt(col.css('borderLeftWidth'), 10) || 0);
 
-        // pin the column to the top if it matches a supplied filter,
-        // or if the column is shorter than the window
-        that.columnData[i].pinTop = pinFilter && col.is(pinFilter) ||
-          (that.columnData[i].height < that.winHeight);
+        that.columnData[i].minFixTop = Math.min(
+          0, that.winHeight - that.columnData[i].height);
+        that.columnData[i].maxFixTop = 0;
+
+        // uncomment this to have it stick to the bottom too rather than just
+        // the top
+        // that.columnData[i].maxFixTop = Math.max(
+        //   0, that.winHeight - that.columnData[i].height);
       });
 
       // Set column top offset - assume they're all the same
       this.columnTop = this.columns.eq(0).offset().top;
 
-      this.set_container_height();
+      this.set_containerHeight();
       this.balance_all(true);
     },
     resize: function (winWidth, winHeight) {
@@ -110,9 +108,10 @@
       this.initialise();
     },
     scroll: function (scrollTop, scrollLeft) {
+      var scrollDelta = scrollTop - this.scrollTop;
       this.scrollTop = scrollTop;
       this.scrollLeft = scrollLeft;
-      this.balance_all();
+      this.balance_all(false, scrollDelta);
     },
     bind: function () {
       /* Bind scrollbalance handlers to the scroll and resize events */
@@ -179,64 +178,62 @@
         }
       });
     },
-    set_container_height: function () {
+    set_containerHeight: function () {
       /* Calculates the maximum column height, i.e. how high the
          container should be. (Don't assume the user is using a
          clearfix hack on their container). If there's only one
          column, use the parent height. */
 
       if (this.columns.length === 1) {
-        this.container_height = this.columns.parent().height();
+        this.containerHeight = this.columns.parent().height();
       } else {
         var height = 0;
         this.columns.each(function () {
           height = Math.max(height, $(this).outerHeight(true));
         });
-        this.container_height = height;
+        this.containerHeight = height;
       }
     },
-    balance: function (col, columnData, force) {
+    balance: function (col, columnData, force, scrollDelta) {
       /* Using the scroll position, container offset, and column
          height, determine whether the column should be fixed or
          absolute, and position it accordingly. */
 
       var state;
-      var topBuffer = this.settings.topBuffer + columnData.marginTop;
-      var maxScroll = this.container_height - columnData.height;
+      var fixTop = columnData.fixTop;
+      var maxScroll = this.containerHeight - columnData.height;
+
+      if (scrollDelta === undefined) {
+        scrollDelta = 0;
+      }
 
       if (maxScroll < this.settings.threshold || !this.balance_enabled) {
         state = 'disabled';
       } else {
-        // convert scrollTop to a value we can use to determine
-        // column content positioning. This changes depending on whether
-        // the content is pinned to the top or bottom
-        var rawScroll;
-        if (columnData.pinTop) {
-          rawScroll = this.scrollTop - this.columnTop + topBuffer;
-        } else {
-          rawScroll = (this.winHeight + this.scrollTop) -
-            (this.columnTop + columnData.height);
-        }
-        var scroll = Math.max(0, Math.min(maxScroll, rawScroll));
+        // determine state, one of
+        // - top
+        // - bottom
+        // - fixed
 
-        if (scroll && scroll < maxScroll) {
-          // container straddles viewport, so container position
-          // is fixed, either at top or bottom depending on
-          // pin_top
-          state = 'fixed';
-        } else if (scroll) {
-          // bottom of container is above bottom of viewport, so
-          // position content at the bottom of the column
+        var topBreakpoint = this.columnTop - columnData.fixTop;
+        var bottomBreakpoint = this.columnTop + this.containerHeight -
+           this.winHeight + Math.max(
+             0, this.winHeight - columnData.height - columnData.fixTop);
+
+        if (this.scrollTop < topBreakpoint) {
+          state = 'top';
+        } else if (this.scrollTop > bottomBreakpoint) {
           state = 'bottom';
         } else {
-          // top of container is below top of viewport, so
-          // position content at the top of the column
-          state = 'top';
+          state = 'fixed';
+          fixTop = columnData.fixTop - scrollDelta;
+          fixTop = Math.max(columnData.minFixTop,
+                            Math.min(columnData.maxFixTop, fixTop));
         }
       }
 
       // update column positioning only if changed
-      if (columnData.state !== state || force) {
+      if (columnData.state !== state || columnData.fixTop !== fixTop || force) {
         var inner = col.find('.' + INNER_CLASSNAME);
         if (state === 'disabled') {
           inner.css({
@@ -246,37 +243,31 @@
             paddingLeft: 0
           });
         } else if (state === 'fixed') {
-          var fixTop = columnData.pinTop ? topBuffer
-                                         : this.winHeight - columnData.height;
           inner.css({
             position: 'fixed',
             top: fixTop,
             left: columnData.fixLeft - this.scrollLeft,
             paddingLeft: columnData.paddingLeft
           });
-        } else if (state === 'bottom') {
+        } else {
+          // assume one of "bottom" or "top"
           inner.css({
             position: 'absolute',
-            top: maxScroll + 'px',
-            left: 0,
-            paddingLeft: columnData.paddingLeft
-          });
-        } else if (state === 'top') {
-          inner.css({
-            position: 'absolute',
-            top: 0,
+            top: (state === 'bottom' ? maxScroll : 0) + 'px',
             left: 0,
             paddingLeft: columnData.paddingLeft
           });
         }
+        columnData.fixTop = fixTop;
         columnData.state = state;
       }
     },
-    balance_all: function (force) {
+    balance_all: function (force, scrollDelta) {
       /* Balance all columns */
       for (var i = 0; i < this.columns.length; i++) {
         if (this.columnData[i]) {
-          this.balance(this.columns.eq(i), this.columnData[i], force);
+          this.balance(this.columns.eq(i), this.columnData[i], force,
+                       scrollDelta);
         }
       }
     }
