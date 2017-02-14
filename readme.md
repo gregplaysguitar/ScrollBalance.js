@@ -1,8 +1,8 @@
-# jQuery Scroll Balance
+# ScrollBalance.js
 
-A jQuery plugin that intelligently uses position: fixed to combat unsightly gaps
-in multi-column layouts, when columns are of different heights. See index.html
-for a demo.
+A javascript plugin that intelligently uses position: fixed to combat unsightly gaps
+in multi-column layouts, when columns are of different heights. See 
+<http://gregplaysguitar.github.io/ScrollBalance.js/> for a demo.
 
 Requires jquery version 1.7 or higher.
 
@@ -12,7 +12,7 @@ With npm:
 
     npm install scrollbalance
 
-or manually:
+or via cdn:
 
     <script type="text/javascript" src="https://www.gitcdn.xyz/repo/gregplaysguitar/ScrollBalance.js/master/ScrollBalance.js"></script>
 
@@ -24,8 +24,9 @@ Start with side-by-side columns, for example:
     <div class="column">...</div>
     <div class="column">...</div>
 
-Columns must be side-by-side, which usually means floated, but doesn't have to -
-they could be absolutely positioned.
+Columns could be floated, inline-block or positioned absolutely - the only 
+requirement is that they're side-by-side on the page.
+
 Initialise the plugin like so:
 
     var scrollbalance = new ScrollBalance($('.column'), {
@@ -46,15 +47,24 @@ Or with jquery:
 - threshold: threshold for activating the plugin, eg the column heights must
     differ by at least this amount to be affected. (default 100)
 
-Advanced example:
+### Methods
 
-    var scrollbalance = new ScrollBalance($('.column'), {
-      // disable on mobile screens
-      minwidth: 767,
-
-      // disable if columns differ by less than 200px
-      threshold: 200
-    });
+- initialize: function () 
+  Recalculate column heights and positioning, for example if content changes
+- resize: function (winWidth, winHeight)
+  Handle a browser resize event
+- scroll: function (scrollTop, scrollLeft)
+  Handle a browser scroll event
+- bind: function ()
+  Bind resize and scroll to the window's corresponding events
+- unbind: function ()
+  Remove resize and scroll from the window's corresponding events  
+- disable: function ()
+  Disable scrollbalance
+- enable: function () {
+  Enable scrollbalance
+- teardown: function () {
+  Remove all traces of scrollbalance from the content
 
 ### Scroll / resize event handling
 
@@ -85,7 +95,10 @@ times:
 To avoid changing the position of the columns, ScrollBalance.js creates a
 wrapper div inside each, and appends the column content dynamically. To avoid
 this, wrap the column content in a div with the class scrollbalance-inner and
-this will be used instead. The div should have no styling.
+this will be used instead. The div should have no styling. E.g.
+
+    <div class="column"><div class="scrollbalance-inner">...</div></div>
+    <div class="column"><div class="scrollbalance-inner">...</div></div>
 
 ### Dynamic content
 
@@ -129,7 +142,7 @@ For example:
 
 ### Demo
 
-See index.html for a demo.
+See <http://gregplaysguitar.github.io/ScrollBalance.js/> for a demo.
 
 ## License
 
