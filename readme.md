@@ -1,15 +1,25 @@
 # jQuery Scroll Balance
 
-A jQuery plugin that intelligently uses position: fixed to combat unsightly gaps 
-in multi-column layouts, when columns are of different heights. See index.html 
+A jQuery plugin that intelligently uses position: fixed to combat unsightly gaps
+in multi-column layouts, when columns are of different heights. See index.html
 for a demo.
 
 Requires jquery version 1.7 or higher.
 
+## Installation
+
+With npm:
+
+    npm install scrollbalance
+
+or manually:
+
+    <script type="text/javascript" src="https://www.gitcdn.xyz/repo/gregplaysguitar/ScrollBalance.js/master/ScrollBalance.js"></script>
+
 ## Usage
 
 Start with side-by-side columns, for example:
-    
+
     <div class="column">...</div>
     <div class="column">...</div>
     <div class="column">...</div>
@@ -18,42 +28,61 @@ Columns must be side-by-side, which usually means floated, but doesn't have to -
 they could be absolutely positioned.
 Initialise the plugin like so:
 
-    var scrollbalance = new ScrollBalance($('.column'), options);
-    scrollbalance.bind();
-    
-Or with jquery:
-
-    $('.column').scrollbalance(options);
-    var scrollbalance = $('.column').data('scrollbalance'); // access the api
-
-
-### Optional parameters
-
-- topBuffer: distance to maintain between the top of the stationary element 
-             and the top of the container. (default 0)
-- threshold: minimum pixel difference in column heights for the plugin to 
-             activate (default 100)
-- pinTopFilter: jquery filter to identify columns which should be pinned to 
-                the top, even if they are taller than the viewport (default 
-                null)
-
-Advanced example:
-    
     var scrollbalance = new ScrollBalance($('.column'), {
-        // keep a 10px gap between the content and the top of the viewport
-        topBuffer: 10,
-        
-        // always balance columns, even if the difference in height is small
-        threshold: 0,
-        
-        // pin column(s) with the class "sidebar" to top
-        pinTopFilter: '.sidebar'
+      // options
     });
     scrollbalance.bind();
 
+Or with jquery:
+
+    $('.column').scrollbalance({});
+    var scrollbalance = $('.column').data('scrollbalance'); // access the api
+
+
+### Options
+
+- minwidth: disable the plugin if the screen width is less than this
+    (default 0)
+- threshold: threshold for activating the plugin, eg the column heights must
+    differ by at least this amount to be affected. (default 100)
+
+Advanced example:
+
+    var scrollbalance = new ScrollBalance($('.column'), {
+      // disable on mobile screens
+      minwidth: 767,
+
+      // disable if columns differ by less than 200px
+      threshold: 200
+    });
+
+### Scroll / resize event handling
+
+ScrollBalance.bind() binds to the window's resize and scroll events, but you
+may want to handle these manually to avoid binding to these events multiple
+times:
+
+    var scrollbalance = new ScrollBalance($('.column'));
+
+    $(window).on('resize', function () {
+      var winWidth = $(window).width();
+      var winHeight = $(window).height();
+      scrollbalance.resize(winWidth, winHeight);
+
+      // other resize behaviour
+    });
+
+    $(window).on('scroll', function () {
+      var scrollTop = $(window).scrollTop();
+      var scrollLeft = $(window).scrollLeft();
+      scrollbalance.scroll(scrollTop, scrollLeft);
+
+      // other scroll behaviour
+    });
+
 ### Column wrapper div
 
-To avoid changing the position of the columns, ScrollBalance.js creates a 
+To avoid changing the position of the columns, ScrollBalance.js creates a
 wrapper div inside each, and appends the column content dynamically. To avoid
 this, wrap the column content in a div with the class scrollbalance-inner and
 this will be used instead. The div should have no styling.
@@ -64,10 +93,10 @@ If your column heights change dynamically, you'll need to call the initialise
 method - for example:
 
     var scrollbalance = new ScrollBalance($('.column'));
-    
+
     // add some content here
     ...
-    
+
     scrollbalance.initialise();
 
 
@@ -76,7 +105,7 @@ method - for example:
 The plugin can be turned on and off with the `enable` and `disable` api
 methods. For example, for smaller screen sizes where the columns don't have
 room to float side-by-side:
-  
+
     var scrollbalance = new ScrollBalance($('.column'));
 
     $(window).on('resize', function() {
@@ -93,7 +122,7 @@ room to float side-by-side:
 
 The `teardown` method removes all trace of jquery-scrollbalance from an element.
 For example:
-    
+
     var scrollbalance = new ScrollBalance($('.column'));
     scrollbalance.teardown();
 

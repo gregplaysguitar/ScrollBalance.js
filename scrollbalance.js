@@ -1,6 +1,6 @@
 /*!
  * ScrollBalance.js v1.1.2
- * http://jquery.com/
+ * https://github.com/gregplaysguitar/ScrollBalance.js/
  *
  * Uses position: fixed to combat unsightly gaps in multi-column layouts,
  * when columns are of different heights.
@@ -10,9 +10,24 @@
  *
  */
 
-(function ($) {
-  var INNER_CLASSNAME = 'scrollbalance-inner';
+(function (window, factory) {
+  // universal module definition - thanks @desandro
+  /* eslint-disable eqeqeq, no-undef */
+  if (typeof define == 'function' && define.amd) {
+    // AMD
+    define(['jquery'], factory);
+  } else if (typeof module == 'object' && module.exports) {
+    // CommonJS
+    module.exports = factory(require('jquery'));
+  } else {
+    // browser global
+    window.ScrollBalance = factory(window.jQuery);
+  }
+  /* eslint-enable eqeqeq, no-undef */
+}(window, function factory ($) {
+  'use strict';
 
+  var INNER_CLASSNAME = 'scrollbalance-inner';
   function ScrollBalance (columns, options) {
     this.columns = columns;
     this.columnData = [];
@@ -32,7 +47,7 @@
 
   ScrollBalance.prototype = {
     // "PUBLIC" METHODS:
-    initialise: function () {
+    initialize: function () {
       /* Position each column inner absolutely within the column,
          and set the column heights, since their content is now
          positioned absolutely.
@@ -40,6 +55,15 @@
          is resized. */
 
       var that = this;
+
+      function columnHeight (col) {
+        var inner = col.find('.' + INNER_CLASSNAME);
+        return inner.height() +
+          parseInt(col.css('borderTop')) +
+          parseInt(col.css('paddingTop')) +
+          parseInt(col.css('paddingBottom')) +
+          parseInt(col.css('borderBottom'));
+      }
 
       // Calculate the maximum column height, i.e. how high the container
       // should be (don't assume the user is using a clearfix hack on their
@@ -51,7 +75,7 @@
       } else {
         var height = 0;
         this.columns.each(function () {
-          height = Math.max(height, $(this).outerHeight(true));
+          height = Math.max(height, columnHeight($(this)));
         });
         this.containerHeight = height;
         this.containerTop = this.columns.eq(0).offset().top;
@@ -72,12 +96,7 @@
 
         // calculate actual height regardless of what it's previously been
         // set to
-        columnData.height =
-          inner.height() +
-          parseInt(col.css('borderTop')) +
-          parseInt(col.css('paddingTop')) +
-          parseInt(col.css('paddingBottom')) +
-          parseInt(col.css('borderBottom'));
+        columnData.height = columnHeight(col);
 
         // disable if not enough difference in height between container and
         // column
@@ -124,7 +143,7 @@
       if (this.settings.minwidth !== null) {
         this.balance_enabled = (winWidth >= this.settings.minwidth);
       }
-      this.initialise();
+      this.initialize();
     },
     scroll: function (scrollTop, scrollLeft) {
       var scrollDelta = scrollTop - this.scrollTop;
@@ -152,12 +171,12 @@
     disable: function () {
       /* Temporarily disable scrollbalance */
       this.balance_enabled = false;
-      this.initialise();
+      this.initialize();
     },
     enable: function () {
       /* Re-enable scrollbalance */
       this.balance_enabled = true;
-      this.initialise();
+      this.initialize();
     },
     teardown: function () {
       /* Remove all traces of scrollbalance from the content */
@@ -293,12 +312,11 @@
     }
 
     var scrollbalance = new ScrollBalance(columns, options);
-    scrollbalance.initialise();
+    scrollbalance.initialize();
     scrollbalance.bind();
 
     this.data('scrollbalance', scrollbalance);
   };
 
-  // export for direct use
-  window.ScrollBalance = ScrollBalance;
-})(window.jQuery);
+  return ScrollBalance;
+}));

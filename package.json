@@ -1,0 +1,29 @@
+{
+  "name": "scrollbalance",
+  "version": "1.2.0",
+  "description": "Uses position: fixed to combat unsightly gaps in multi-column layouts, when columns are of different heights.",
+  "main": "scrollbalance.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gregplaysguitar/ScrollBalance.js.git"
+  },
+  "keywords": [
+    "jquery-plugin",
+    "ecosystem:jquery",
+    "scrolling",
+    "layout",
+    "fixed"
+  ],
+  "author": "Greg Brown",
+  "license": "MIT",
+  "dependencies": {
+    "jquery": ">=1.7"
+  },
+  "bugs": {
+    "url": "https://github.com/gregplaysguitar/ScrollBalance.js/issues"
+  },
+  "homepage": "https://github.com/gregplaysguitar/ScrollBalance.js#readme"
+}
