@@ -145,6 +145,15 @@ For example:
 
 See <http://gregplaysguitar.github.io/ScrollBalance.js/> for a demo.
 
+
+### Sites using ScrollBalance.js
+
+* [Govett Brewster gallery](http://govettbrewster.com/news/2017/2/govett-brewster-art-gallerylen-lye-centre-launches)
+* [Amisfield Winery](http://amisfield.co.nz/wines/shipping)
+* [New Zealand Institute of Landscape Architects](https://nzila.co.nz/news/)
+* [Glamuzina Architects](http://www.g-a.co.nz/projects/lake-hawea-courtyard-house/)
+
+
 ## License
 
 The plugin is licensed under the MIT License (LICENSE.txt).
