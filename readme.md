@@ -42,28 +42,29 @@ Or with jquery:
 
 ### Options
 
-- minwidth: disable the plugin if the screen width is less than this
-    (default 0)
-- threshold: threshold for activating the plugin, eg the column heights must
-    differ by at least this amount to be affected. (default 100)
+- `minwidth`  
+   disable the plugin if the screen width is less than this (default 0)
+- `threshold`  
+  threshold for activating the plugin, eg the column heights must differ by at 
+  least this amount to be affected. (default 100)
 
 ### Methods
 
-- initialize: function () 
-  Recalculate column heights and positioning, for example if content changes
-- resize: function (winWidth, winHeight)
+- `initialize: function ()`  
+  Recalculate column heights and positioning, for example if content changes
+- `resize: function (winWidth, winHeight)`  
   Handle a browser resize event
-- scroll: function (scrollTop, scrollLeft)
+- `scroll: function (scrollTop, scrollLeft)`  
   Handle a browser scroll event
-- bind: function ()
+- `bind: function ()`  
   Bind resize and scroll to the window's corresponding events
-- unbind: function ()
+- `unbind: function ()`  
   Remove resize and scroll from the window's corresponding events  
-- disable: function ()
+- `disable: function ()`  
   Disable scrollbalance
-- enable: function () {
+- `enable: function ()`  
   Enable scrollbalance
-- teardown: function () {
+- `teardown: function ()`  
   Remove all traces of scrollbalance from the content
 
 ### Scroll / resize event handling
