@@ -1,6 +1,6 @@
 {
   "name": "scrollbalance",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Uses position: fixed to combat unsightly gaps in multi-column layouts, when columns are of different heights.",
   "main": "scrollbalance.js",
   "scripts": {
