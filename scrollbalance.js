@@ -133,9 +133,8 @@
           });
           col.height('');
         }
+        that.balance(col, columnData, true);
       });
-
-      this.balance_all(true);
     },
     resize: function (winWidth, winHeight) {
       this.winHeight = winHeight;
