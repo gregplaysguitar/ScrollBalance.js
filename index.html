@@ -18,13 +18,13 @@
         font-family: helvetica, sans-serif;
       }
       #container {
-        width: 960px;
+        max-width: 960px;
         margin: 0 auto;
       }
       h1,
       .info {
-        margin-left: 10px;
-        margin-right: 10px;
+        margin-left: 1%;
+        margin-right: 1%;
       }
       a {
         cursor: pointer;
@@ -44,14 +44,33 @@
         color: #222;
       }
       .column {
-        width: 300px;
+        width: 31.33%;
         display: inline-block;
         vertical-align: top;
-        margin: 0 10px;
+        margin: 0 1%;
         color: #aaa;
       }
       .toggle {
-        color: green;
+        border: 1px solid #ccc;
+        background: #eee;
+        padding: 10px;
+        display: inline-block;
+        text-decoration: none;
+        min-width: 240px;
+        text-align: center;
+        background: #efe;
+      }
+      .toggle:hover {
+        text-decoration: underline;
+      }
+      .toggle::after {
+        content: ': on';
+      }
+      .toggle.disabled {
+        background: #fee;
+      }
+      .toggle.disabled::after {
+        content: ': off';
       }
       footer {
         margin: 0 10px 50px;
@@ -59,12 +78,20 @@
         min-height: 50vh;
       }
 
+      @media screen and (max-width: 767px) {
+        .column {
+          width: auto;
+          display: block;
+        }
+      }
     </style>
     <script type="text/javascript">
       $(function() {
         var cols = $('.wrap .column');
         var enabled = true;
-        var scrollbalance = new ScrollBalance(cols);
+        var scrollbalance = new ScrollBalance(cols, {
+          minwidth: 768
+        });
 
         // bind to scroll and resize events
         scrollbalance.bind();
@@ -81,14 +108,12 @@
           if (enabled) {
             enabled = false;
             scrollbalance.disable();
-            $('a.toggle span').text('disabled');
-            $('a.toggle').css('color', 'red');
+            $('a.toggle').addClass('disabled');
           }
           else {
             enabled = true;
             scrollbalance.enable();
-            $('a.toggle span').text('enabled');
-            $('a.toggle').css('color', 'green');
+            $('a.toggle').removeClass('disabled');
           }
         });
       });
@@ -126,11 +151,11 @@ sb.teardown();
       </pre>
 
       <p>
-        Scroll down the page to see the demo in action.
+        Scroll down the page to see the demo in action. ScrollBalance will be
+        active for screens at least 768px, and disabled for smaller screens.
       </p>
-      <p>
-        Toggle plugin: <a class="toggle"><span>enabled</span></a>
-      </p>
+      <a class="toggle">Toggle ScrollBalance</a>
+
     </section>
 
     <div class="wrap">
