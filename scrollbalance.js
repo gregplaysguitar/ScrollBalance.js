@@ -59,10 +59,10 @@
       function columnHeight (col) {
         var inner = col.find('.' + INNER_CLASSNAME);
         return inner.height() +
-          parseInt(col.css('borderTop')) +
-          parseInt(col.css('paddingTop')) +
-          parseInt(col.css('paddingBottom')) +
-          parseInt(col.css('borderBottom'));
+          parseInt(col.css('borderTop') || 0) +
+          parseInt(col.css('paddingTop') || 0) +
+          parseInt(col.css('paddingBottom') || 0) +
+          parseInt(col.css('borderBottom') || 0);
       }
 
       // Calculate the maximum column height, i.e. how high the container
