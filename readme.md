@@ -27,6 +27,10 @@ Start with side-by-side columns, for example:
 Columns could be floated, inline-block or positioned absolutely - the only 
 requirement is that they're side-by-side on the page.
 
+With multiple columns, the tallest will be used as the reference height which 
+the others scroll and fix within. If there's only one column, it will scroll 
+and fix within it's parent element.
+
 Initialise the plugin like so:
 
     var scrollbalance = new ScrollBalance($('.column'), {
