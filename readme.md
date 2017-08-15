@@ -31,7 +31,7 @@ With multiple columns, the tallest will be used as the reference height which
 the others scroll and fix within. If there's only one column, it will scroll 
 and fix within it's parent element.
 
-Initialise the plugin like so:
+Initialize the plugin like so:
 
     var scrollbalance = new ScrollBalance($('.column'), {
       // options
@@ -107,7 +107,7 @@ this will be used instead. The div should have no styling. E.g.
 
 ### Dynamic content
 
-If your column heights change dynamically, you'll need to call the initialise
+If your column heights change dynamically, you'll need to call the initialize
 method - for example:
 
     var scrollbalance = new ScrollBalance($('.column'));
@@ -115,7 +115,7 @@ method - for example:
     // add some content here
     ...
 
-    scrollbalance.initialise();
+    scrollbalance.initialize();
 
 
 ### Temporarily disabling the plugin
