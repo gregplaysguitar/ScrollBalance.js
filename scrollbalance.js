@@ -117,7 +117,7 @@
         if (that.balance_enabled && columnData.enabled) {
           inner.css({
             width: col.css('width'),
-            transform: 'translateZ(0px)',
+            // transform: 'translateZ(0px)',
             padding: col.css('padding')
             // other css for this element is handled in balance()
           });
@@ -128,7 +128,7 @@
           // reset state
           inner.css({
             width: '',
-            transform: '',
+            // transform: '',
             padding: ''
           });
           col.height('');
