@@ -16,6 +16,10 @@ or via cdn:
 
     <script type="text/javascript" src="https://www.gitcdn.xyz/repo/gregplaysguitar/ScrollBalance.js/master/ScrollBalance.js"></script>
 
+## Polyfills
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+
 ## Usage
 
 Start with side-by-side columns, for example:
