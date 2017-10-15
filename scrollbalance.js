@@ -44,11 +44,30 @@
     return height
   }
 
+  function windowSize () {
+    var e = window
+    var a = 'inner'
+    if (!('innerWidth' in window)) {
+      a = 'client'
+      e = document.documentElement || document.body
+    }
+    return {width: e[a + 'Width'], height: e[a + 'Height']}
+  }
+
+  function windowScroll () {
+    var doc = document.documentElement
+    return {
+      left: (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),
+      top: (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0)
+    }
+  }
+
   function getOffset (el) {
     var rect = el.getBoundingClientRect()
+    var scroll = windowScroll()
     return {
-      top: rect.top + document.body.scrollTop,
-      left: rect.left + document.body.scrollLeft
+      top: rect.top + scroll.top,
+      left: rect.left + scroll.left
     }
   }
 
@@ -99,6 +118,7 @@
         var parent = this.columns[0].parentElement
         this.containerHeight = getHeight(parent)
         this.containerTop = getOffset(parent).top
+        console.log(parent, getOffset(parent), this.containerTop)
       } else {
         var height = 0
         this.columns.forEach(function (col) {
@@ -191,7 +211,8 @@
       // })
       if (!this.resizeHandler) {
         this.resizeHandler = function () {
-          that.resize(window.innerWidth, window.innerHeight)
+          var size = windowSize()
+          that.resize(size.width, size.height)
         }
       }
       window.addEventListener('resize', this.resizeHandler)
@@ -331,8 +352,8 @@
           // })
           var fixLeft = columnData.fixLeft - this.scrollLeft
           inner.style.position = 'fixed'
-          inner.style.top = fixTop
-          inner.style.left = fixLeft
+          inner.style.top = fixTop + 'px'
+          inner.style.left = fixLeft + 'px'
           console.log(state, 2)
         } else {
           // assume one of "bottom" or "top"
@@ -343,9 +364,9 @@
           //   left: 0
           // })
           var top = (state === 'bottom' ? this.containerHeight -
-            columnData.height : 0) + 'px'
+            columnData.height : 0)
           inner.style.position = 'absolute'
-          inner.style.top = top
+          inner.style.top = top + 'px'
           inner.style.left = 0
         }
         columnData.fixTop = fixTop
