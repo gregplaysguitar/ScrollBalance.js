@@ -118,7 +118,7 @@
         var parent = this.columns[0].parentElement
         this.containerHeight = getHeight(parent)
         this.containerTop = getOffset(parent).top
-        console.log(parent, getOffset(parent), this.containerTop)
+        // console.log(parent, getOffset(parent), this.containerTop)
       } else {
         var height = 0
         this.columns.forEach(function (col) {
@@ -343,7 +343,7 @@
           inner.style.position = ''
           inner.style.top = ''
           inner.style.left = ''
-          console.log(state, 1)
+          // console.log(state, 1)
         } else if (state === 'fixed') {
           // inner.css({
           //   position: 'fixed',
@@ -354,7 +354,7 @@
           inner.style.position = 'fixed'
           inner.style.top = fixTop + 'px'
           inner.style.left = fixLeft + 'px'
-          console.log(state, 2)
+          // console.log(state, 2)
         } else {
           // assume one of "bottom" or "top"
           // inner.css({
@@ -371,7 +371,7 @@
         }
         columnData.fixTop = fixTop
         columnData.state = state
-        console.log(state, 3)
+        // console.log(state, 3)
       }
     },
     balance_all: function (force, scrollDelta) {
