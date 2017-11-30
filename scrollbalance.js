@@ -111,11 +111,6 @@
       function columnHeight (col) {
         var inner = col.querySelector('.' + INNER_CLASSNAME)
         return inner.offsetHeight
-        // return inner.height() +
-        //   parseInt(col.css('borderTop')) +
-        //   parseInt(col.css('paddingTop')) +
-        //   parseInt(col.css('paddingBottom')) +
-        //   parseInt(col.css('borderBottom'))
       }
 
       // Calculate the maximum column height, i.e. how high the container
