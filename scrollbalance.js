@@ -100,6 +100,14 @@
 
       var that = this
 
+      // set col and inner dimensions
+      this.columns.forEach(function (col, i) {
+        var inner = col.querySelector('.' + INNER_CLASSNAME)
+        inner.style.width = window.getComputedStyle(col).width
+        inner.style.padding = window.getComputedStyle(col).padding
+        col.style.height = window.getComputedStyle(inner).height
+      })
+
       function columnHeight (col) {
         var inner = col.querySelector('.' + INNER_CLASSNAME)
         return inner.offsetHeight
@@ -160,31 +168,6 @@
         // columnData.maxFixTop = Math.max(
         //   0, that.winHeight - columnData.height)
 
-        if (that.balance_enabled && columnData.enabled) {
-          inner.style.width = window.getComputedStyle(col).width
-          inner.style.padding = window.getComputedStyle(col).padding
-          // inner.css({
-          //   width: col.css('width'),
-          //   // transform: 'translateZ(0px)',
-          //   padding: col.css('padding')
-          //   // other css for this element is handled in balance()
-          // })
-          col.style.height = window.getComputedStyle(inner).height
-          // col.css({
-          //   height: inner.css('height')
-          // })
-        } else {
-          // reset state
-          inner.style.width = ''
-          inner.style.padding = ''
-          // inner.css({
-          //   width: '',
-          //   // transform: '',
-          //   padding: ''
-          // })
-          col.style.height = ''
-          // col.height('')
-        }
         that.balance(col, columnData, true)
       })
     },
@@ -289,6 +272,10 @@
           //   .data('sb-created', true)
           // col.html('').append(inner)
         }
+
+        // inner is always position absolute (or fixed) to avoid height
+        // calculation discrepancies
+        inner.style.position = 'absolute'
       })
     },
     balance: function (col, columnData, force, scrollDelta) {
@@ -340,9 +327,9 @@
           //   top: '',
           //   left: ''
           // })
-          inner.style.position = ''
-          inner.style.top = ''
-          inner.style.left = ''
+          inner.style.position = 'absolute'
+          inner.style.top = 0
+          inner.style.left = 0
           // console.log(state, 1)
         } else if (state === 'fixed') {
           // inner.css({
