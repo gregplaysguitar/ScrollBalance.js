@@ -4,8 +4,6 @@ A javascript plugin that intelligently uses position: fixed to combat unsightly 
 in multi-column layouts, when columns are of different heights. See 
 <http://gregplaysguitar.github.io/ScrollBalance.js/> for a demo.
 
-Requires jquery version 1.7 or higher.
-
 ## Installation
 
 With npm:
@@ -33,15 +31,10 @@ and fix within it's parent element.
 
 Initialize the plugin like so:
 
-    var scrollbalance = new ScrollBalance($('.column'), {
+    var scrollbalance = new ScrollBalance(document.querySelector('.column'), {
       // options
     });
     scrollbalance.bind();
-
-Or with jquery:
-
-    $('.column').scrollbalance({});
-    var scrollbalance = $('.column').data('scrollbalance'); // access the api
 
 
 ### Options
@@ -77,19 +70,19 @@ ScrollBalance.bind() binds to the window's resize and scroll events, but you
 may want to handle these manually to avoid binding to these events multiple
 times:
 
-    var scrollbalance = new ScrollBalance($('.column'));
+    var scrollbalance = new ScrollBalance(document.querySelector('.column'));
 
-    $(window).on('resize', function () {
-      var winWidth = $(window).width();
-      var winHeight = $(window).height();
+    window.addEventListener('resize', function () {
+      var winWidth =  window.innerWidth;
+      var winHeight = window.innerHeight;
       scrollbalance.resize(winWidth, winHeight);
 
       // other resize behaviour
     });
 
-    $(window).on('scroll', function () {
-      var scrollTop = $(window).scrollTop();
-      var scrollLeft = $(window).scrollLeft();
+    window.addEventListener('scroll', function () {
+      var scrollTop = window.scrollY;
+      var scrollLeft =  window.scrollX;
       scrollbalance.scroll(scrollTop, scrollLeft);
 
       // other scroll behaviour
@@ -110,7 +103,7 @@ this will be used instead. The div should have no styling. E.g.
 If your column heights change dynamically, you'll need to call the initialize
 method - for example:
 
-    var scrollbalance = new ScrollBalance($('.column'));
+    var scrollbalance = new ScrollBalance(document.querySelector('.column'));
 
     // add some content here
     ...
@@ -124,10 +117,10 @@ The plugin can be turned on and off with the `enable` and `disable` api
 methods. For example, for smaller screen sizes where the columns don't have
 room to float side-by-side:
 
-    var scrollbalance = new ScrollBalance($('.column'));
+    var scrollbalance = new ScrollBalance(document.querySelector('.column'));
 
-    $(window).on('resize', function() {
-        if ($(window).width() > 900) {
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 900) {
             scrollbalance.enable();
         }
         else {
@@ -138,10 +131,10 @@ room to float side-by-side:
 
 ### Removing the plugin from an element
 
-The `teardown` method removes all trace of jquery-scrollbalance from an element.
+The `teardown` method removes all trace of Scrollbalance from an element.
 For example:
 
-    var scrollbalance = new ScrollBalance($('.column'));
+    var scrollbalance = new ScrollBalance(document.querySelector('.column'));
     scrollbalance.teardown();
 
 
